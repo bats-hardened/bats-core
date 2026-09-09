@@ -2,6 +2,7 @@ name: Tests
 
 # Controls when the action will run.
 on:
+  workflow_call:
   pull_request:
     branches:
       - main
