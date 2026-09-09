@@ -16,10 +16,12 @@
     "uninstall.sh"
   ],
   "directories": {
-    "bin": "bin",
     "doc": "docs",
     "man": "man",
     "test": "test"
+  },
+  "bin": {
+    "bats": "bin/bats"
   },
   "scripts": {
     "test": "bin/bats test"
