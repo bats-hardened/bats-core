@@ -284,10 +284,9 @@ jobs:
       - name: Build and install RPM and dependencies
         run: |
           rpmdev-setuptree
-          source_archive=$(rpmspec -q --qf '%{SOURCE0}' contrib/rpm/bats.spec)
-          source_archive=${source_archive##*/}
-          source_directory=$(rpmspec -q --qf '%{repo}-%{upstream_version}' contrib/rpm/bats.spec)
-          tar --transform "s,^,${source_directory}/," -cf "/github/home/rpmbuild/SOURCES/${source_archive}" ./
+          upstream_version=$(sed -nE 's/^%global[[:space:]]+upstream_version[[:space:]]+([^[:space:]]+)$/\1/p' contrib/rpm/bats.spec)
+          tar --transform "s,^,bats-core-${upstream_version}/," \
+            -cf "/github/home/rpmbuild/SOURCES/v${upstream_version}.tar.gz" ./
           rpmbuild -v -bb ./contrib/rpm/bats.spec
           ls -al /github/home/rpmbuild/RPMS/noarch/
           dnf install -y /github/home/rpmbuild/RPMS/noarch/bats-*.rpm
