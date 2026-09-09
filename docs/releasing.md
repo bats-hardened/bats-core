@@ -51,7 +51,7 @@ $ git push --follow-tags
 Pushing a `v<major>.<minor>.<patch>` tag starts the release workflow. It first
 runs the full test matrix, then publishes the npm and container packages,
 creates the release artifacts, and finally creates the GitHub release. A
-SemVer prerelease tag such as `v1.14.0-alpha01` follows the same flow, but is
+SemVer prerelease tag such as `v1.14.1-alpha05` follows the same flow, but is
 published to npm with the `next` dist-tag, does not update container `latest`
 tags, and creates a GitHub prerelease.
 
