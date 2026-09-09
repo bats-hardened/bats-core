@@ -104,9 +104,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
-        with:
-          node-version: v18.20.2
       - run: npm pack ./
       - run: npm install -g ./bats-*.tgz
       - name: Run test on OS ${{ matrix.os }}
@@ -135,9 +132,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
-        with:
-          node-version: v18.20.2
       - run: npm pack ./
       - run: npm install -g (get-item .\bats-*.tgz).FullName
       - run: bats  -T --print-output-on-failure test
@@ -182,9 +176,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
-        with:
-          node-version: v18.20.2
       - name: Install unbuffer via expect
         run: brew install expect
       - name: Run test on OS ${{ matrix.os }}
