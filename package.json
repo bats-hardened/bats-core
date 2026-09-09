@@ -1,12 +1,12 @@
 {
-  "name": "bats",
+  "name": "@bats-hardened/bats",
   "version": "1.14.0",
   "description": "Bash Automated Testing System",
-  "homepage": "https://github.com/bats-core/bats-core#readme",
+  "homepage": "https://github.com/bats-hardened/bats-core#readme",
   "license": "MIT",
   "author": "Sam Stephenson <sstephenson@gmail.com> (http://sstephenson.us/)",
-  "repository": "github:bats-core/bats-core",
-  "bugs": "https://github.com/bats-core/bats-core/issues",
+  "repository": "github:bats-hardened/bats-core",
+  "bugs": "https://github.com/bats-hardened/bats-core/issues",
   "files": [
     "bin",
     "libexec",
