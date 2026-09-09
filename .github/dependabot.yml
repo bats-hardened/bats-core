@@ -1,47 +1,40 @@
 version: 2
+
 updates:
-  - package-ecosystem: docker
-    directory: /.devcontainer
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: daily
+      interval: "weekly"
+    open-pull-requests-limit: 5
     labels:
-      - docker
-      - devcontainer
-      - dependencies
-      - no changelog
+      - "dependencies"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    cooldown:
+      default-days: 7
 
-  - package-ecosystem: github-actions
-    directory: /
+  - package-ecosystem: "npm"
+    directories:
+      - "/"
+      - "/*"
     schedule:
-      interval: daily
+      interval: "weekly"
+    open-pull-requests-limit: 5
     labels:
-      - github-actions
-      - dependencies
-      - no changelog
-
-  - package-ecosystem: docker
-    directory: /
-    schedule:
-      interval: daily
-    labels:
-      - docker
-      - dependencies
-      - no changelog
-
-  - package-ecosystem: pip
-    directory: /docs/source
-    schedule:
-      interval: daily
-    labels:
-      - pip
-      - dependencies
-      - no changelog
-
-  - package-ecosystem: npm
-    directory: /
-    schedule:
-      interval: daily
-    labels:
-      - npm
-      - dependencies
-      - no changelog
+      - "dependencies"
+    groups:
+      npm:
+        patterns:
+          - "*"
+    cooldown:
+      default-days: 7
+    ignore:
+      # ignore to keep in sync with node24 used by GH runners
+      - dependency-name: "@types/node"
+        update-types:
+          - "version-update:semver-major"
+      # ignore until ESLint supports TS 7
+      - dependency-name: "typescript"
+        versions: [">=7"]
