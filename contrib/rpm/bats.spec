@@ -5,12 +5,13 @@
 Name:           bats
 Version:        1.14.0
 Release:        1%{?dist}
+%global upstream_version 1.14.0
 Summary:        Bash Automated Testing System
 
 Group:          Development/Libraries
 License:        MIT
 URL:            https://%{provider}/%{project}/%{repo}
-Source0:        https://%{provider}/%{project}/%{repo}/archive/v%{version}.tar.gz
+Source0:        https://%{provider}/%{project}/%{repo}/archive/v%{upstream_version}.tar.gz
 
 BuildArch:      noarch
 
@@ -22,7 +23,7 @@ It provides a simple way to verify that the UNIX programs you write behave as ex
 Bats is most useful when testing software written in Bash, but you can use it to test any UNIX program.
 
 %prep
-%setup -q -n %{repo}-%{version}
+%setup -q -n %{repo}-%{upstream_version}
 
 %install
 mkdir -p ${RPM_BUILD_ROOT}%{_prefix} ${RPM_BUILD_ROOT}%{_libexecdir} ${RPM_BUILD_ROOT}%{_mandir}
