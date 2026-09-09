@@ -23,7 +23,7 @@ with the message `Bats <VERSION>`, where `<VERSION>` is the new version number.
 Create a new signed, annotated tag with:
 
 ```bash
-$ git tag -a -s <VERSION>
+$ git tag -a -s v<VERSION>
 ```
 
 Include the `docs/CHANGELOG.md` notes corresponding to the new version as the
@@ -48,14 +48,9 @@ Push the new version commit and tag to GitHub via the following:
 $ git push --follow-tags
 ```
 
-Then visit https://github.com/bats-core/bats-core/releases, and:
-
-* Click **Draft a new release**.
-* Select the new version tag.
-* Name the release: `Bats <VERSION>`.
-* Paste the same notes from the version tag annotation as the description,
-  except change the first line to read: `Released: YYYY-MM-DD`.
-* Click **Publish release**.
+Pushing a `v<major>.<minor>.<patch>` tag starts the release workflow. It first
+runs the full test matrix, then publishes the npm and container packages,
+creates the release artifacts, and finally creates the GitHub release.
 
 For more on `git push --follow-tags`, see:
 
