@@ -1,5 +1,5 @@
 {
-  "name": "bats",
+  "name": "@bats-hardened/bats",
   "version": "1.14.0",
   "description": "Bash Automated Testing System",
   "homepage": "https://github.com/bats-core/bats-core#readme",
