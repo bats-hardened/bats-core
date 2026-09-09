@@ -1,0 +1,143 @@
+name: "CI: Release"
+run-name: Release ${{ github.ref_name }}
+
+"on":
+  push:
+    tags:
+      - "v*.*.*"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify-tagged-commit:
+    name: Verify release tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify tagged commit and version
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" "origin/$DEFAULT_BRANCH"; then
+            echo "Tag $RELEASE_TAG points to $GITHUB_SHA, which is not on origin/$DEFAULT_BRANCH." >&2
+            exit 1
+          fi
+
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Release tags must use the form v<major>.<minor>.<patch>." >&2
+            exit 1
+          fi
+
+          version="${RELEASE_TAG#v}"
+          package_version="$(node --print 'require("./package.json").version')"
+          bats_version="$(
+            # shellcheck disable=SC1090
+            source <(grep '^export BATS_VERSION=' libexec/bats-core/bats)
+            printf '%s' "$BATS_VERSION"
+          )"
+          rpm_version="$(sed -nE 's/^Version:[[:space:]]*//p' contrib/rpm/bats.spec)"
+          if [[ "$version" != "$package_version" || "$version" != "$bats_version" || "$version" != "$rpm_version" ]]; then
+            printf 'Tag (%s), package.json (%s), bats (%s), and RPM spec (%s) versions must match.\n' \
+              "$version" "$package_version" "$bats_version" "$rpm_version" >&2
+            exit 1
+          fi
+
+  test:
+    name: Run test matrix
+    needs: verify-tagged-commit
+    uses: ./.github/workflows/tests.yml
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+
+  publish-npm-packages:
+    name: Publish npm packages
+    needs: test
+    uses: ./.github/workflows/release_npm.yml
+    permissions:
+      contents: read
+      packages: write
+    secrets: inherit
+
+  publish-container-images:
+    name: Publish container images
+    needs: test
+    uses: ./.github/workflows/release_container_images.yml
+    permissions:
+      contents: read
+      packages: write
+    secrets: inherit
+
+  create-release-artifacts:
+    name: Create release artifacts
+    needs:
+      - publish-npm-packages
+      - publish-container-images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+      - name: Package release artifacts
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#v}"
+          mkdir dist
+          npm pack --ignore-scripts --pack-destination dist
+          git archive --format=tar.gz --prefix="bats-core-${version}/" \
+            --output="dist/bats-core-${version}.tar.gz" "$GITHUB_SHA"
+          (
+            cd dist
+            sha256sum * > SHA256SUMS
+          )
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-artifacts
+          path: dist/
+          if-no-files-found: error
+
+  create-github-release:
+    name: Create GitHub release
+    needs: create-release-artifacts
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download release artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-artifacts
+          path: dist
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          TARGET_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          gh release create "$RELEASE_TAG" dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$TARGET_SHA" \
+            --verify-tag \
+            --title "Bats ${RELEASE_TAG#v}" \
+            --generate-notes
