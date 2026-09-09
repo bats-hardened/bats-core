@@ -48,9 +48,15 @@ jobs:
             printf '%s' "$BATS_VERSION"
           )"
           rpm_version="$(sed -nE 's/^Version:[[:space:]]*//p' contrib/rpm/bats.spec)"
-          if [[ "$version" != "$package_version" || "$version" != "$bats_version" || "$version" != "$rpm_version" ]]; then
-            printf 'Tag (%s), package.json (%s), bats (%s), and RPM spec (%s) versions must match.\n' \
-              "$version" "$package_version" "$bats_version" "$rpm_version" >&2
+          rpm_release="$(sed -nE 's/^Release:[[:space:]]*//p' contrib/rpm/bats.spec | sed 's/%{?dist}$//')"
+          if [[ "$rpm_release" == 0.* ]]; then
+            rpm_release_version="${rpm_version}-${rpm_release#0.}"
+          else
+            rpm_release_version="$rpm_version"
+          fi
+          if [[ "$version" != "$package_version" || "$version" != "$bats_version" || "$version" != "$rpm_release_version" ]]; then
+            printf 'Tag (%s), package.json (%s), bats (%s), and RPM spec (%s-%s) versions must match.\n' \
+              "$version" "$package_version" "$bats_version" "$rpm_version" "$rpm_release" >&2
             exit 1
           fi
 
