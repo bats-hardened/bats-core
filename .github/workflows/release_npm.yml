@@ -16,9 +16,17 @@ jobs:
       - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
         with:
           registry-url: https://registry.npmjs.org
-      - run: npm publish --ignore-scripts
+      - name: Publish package
         env:
+          RELEASE_TAG: ${{ github.ref_name }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ "$RELEASE_TAG" == *-* ]]; then
+            npm publish --ignore-scripts --tag next
+          else
+            npm publish --ignore-scripts
+          fi
 
   github-npm:
     runs-on: ubuntu-latest
@@ -34,6 +42,14 @@ jobs:
           registry-url: https://npm.pkg.github.com
       - name: Scope package name as required by GitHub Packages
         run: npm init -y --scope "${{ github.repository_owner }}"
-      - run: npm publish --ignore-scripts
+      - name: Publish package
         env:
+          RELEASE_TAG: ${{ github.ref_name }}
           NODE_AUTH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [[ "$RELEASE_TAG" == *-* ]]; then
+            npm publish --ignore-scripts --tag next
+          else
+            npm publish --ignore-scripts
+          fi
