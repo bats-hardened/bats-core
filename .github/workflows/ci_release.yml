@@ -35,8 +35,8 @@ jobs:
             exit 1
           fi
 
-          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Release tags must use the form v<major>.<minor>.<patch>." >&2
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]; then
+            echo "Release tags must use v<major>.<minor>.<patch> or a SemVer prerelease suffix." >&2
             exit 1
           fi
 
@@ -135,9 +135,14 @@ jobs:
           TARGET_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
+          release_args=()
+          if [[ "$RELEASE_TAG" == *-* ]]; then
+            release_args+=(--prerelease)
+          fi
           gh release create "$RELEASE_TAG" dist/* \
             --repo "$GITHUB_REPOSITORY" \
             --target "$TARGET_SHA" \
             --verify-tag \
             --title "Bats ${RELEASE_TAG#v}" \
-            --generate-notes
+            --generate-notes \
+            "${release_args[@]}"
