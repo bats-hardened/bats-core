@@ -3,9 +3,9 @@
 %global repo            bats-core
 
 Name:           bats
-Version:        1.14.0
-Release:        1%{?dist}
-%global upstream_version 1.14.0
+Version:        1.14.1
+Release:        0.beta09%{?dist}
+%global upstream_version 1.14.1-beta09
 Summary:        Bash Automated Testing System
 
 Group:          Development/Libraries
