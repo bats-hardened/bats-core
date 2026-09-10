@@ -88,12 +88,20 @@ jobs:
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }
-      - name: Run installed package without the npm PowerShell shim
+      - name: Run installed package through the npm PowerShell shim
         shell: pwsh
         run: |
-          $npm_prefix = npm prefix -g
-          $installed_bats = Join-Path $npm_prefix 'node_modules\@bats-hardened\bats\bin\bats'
-          & bash -c 'installed_bats=$(cygpath -u "$1"); time "$installed_bats" -T --print-output-on-failure test' -- $installed_bats
+          Measure-Command { & bats -T --print-output-on-failure test } | ForEach-Object TotalSeconds
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }
+      # The direct Bash entry point already completed in 6m35s in run 34431656159.
+      # - name: Run installed package without the npm PowerShell shim
+      #   shell: pwsh
+      #   run: |
+      #     $npm_prefix = npm prefix -g
+      #     $installed_bats = Join-Path $npm_prefix 'node_modules\@bats-hardened\bats\bin\bats'
+      #     & bash -c 'installed_bats=$(cygpath -u "$1"); time "$installed_bats" -T --print-output-on-failure test' -- $installed_bats
+      #     if ($LASTEXITCODE -ne 0) {
+      #       exit $LASTEXITCODE
+      #     }
