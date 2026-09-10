@@ -65,7 +65,7 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/bats:${{ steps.version.outputs.version }}-no-faccessat2
             ghcr.io/${{ github.repository_owner }}/bats:${{ steps.version.outputs.version }}-no-faccessat2
           push: true
-          build-args: bashver=5.1.4
+          build-args: bashver=5.3.15
       - name: Build and publish stable no-faccessat2 image
         if: ${{ !contains(github.ref_name, '-') }}
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
@@ -77,4 +77,4 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/bats:${{ steps.version.outputs.version }}-no-faccessat2
             ghcr.io/${{ github.repository_owner }}/bats:latest-no-faccessat2
           push: true
-          build-args: bashver=5.1.4
+          build-args: bashver=5.3.15
