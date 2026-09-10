@@ -1,0 +1,43 @@
+name: Benchmark npm Windows launcher
+
+on:
+  workflow_dispatch:
+    inputs:
+      os:
+        description: Windows runner image
+        required: true
+        default: windows-2025
+        type: choice
+        options:
+          - windows-2022
+          - windows-2025
+
+permissions:
+  contents: read
+
+jobs:
+  installed-package-without-npm-shim:
+    runs-on: ${{ inputs.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: npm pack ./
+      - run: npm install -g (get-item .\bats-*.tgz).FullName
+      - name: Show installed command paths
+        shell: pwsh
+        run: |
+          Get-Command bats -All | Format-List CommandType, Name, Source, Definition
+          $npm_prefix = npm prefix -g
+          $installed_bats = Join-Path $npm_prefix 'node_modules\@bats-hardened\bats\bin\bats'
+          Write-Output "Installed Bash entry point: $installed_bats"
+          if (-not (Test-Path $installed_bats)) {
+            throw "Installed Bash entry point does not exist"
+          }
+      - name: Run installed package without the npm PowerShell shim
+        shell: pwsh
+        run: |
+          $npm_prefix = npm prefix -g
+          $installed_bats = Join-Path $npm_prefix 'node_modules\@bats-hardened\bats\bin\bats'
+          & bash -c 'installed_bats=$(cygpath -u "$1"); time "$installed_bats" -T --print-output-on-failure test' -- $installed_bats
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
