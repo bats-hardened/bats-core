@@ -5,6 +5,7 @@ name: Publish npm packages
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   npmjs:
@@ -15,11 +16,11 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
         with:
+          node-version: "24"
           registry-url: https://registry.npmjs.org
       - name: Publish package
         env:
           RELEASE_TAG: ${{ github.ref_name }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
           if [[ "$RELEASE_TAG" == *-* ]]; then
