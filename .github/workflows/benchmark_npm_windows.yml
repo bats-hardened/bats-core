@@ -32,6 +32,62 @@ jobs:
           if (-not (Test-Path $installed_bats)) {
             throw "Installed Bash entry point does not exist"
           }
+      - name: Compare PowerShell shim and Bash entry-point environments
+        shell: pwsh
+        run: |
+          $diagnostic_dir = Join-Path $env:RUNNER_TEMP 'bats-launcher-diagnostic'
+          New-Item -ItemType Directory -Force $diagnostic_dir | Out-Null
+          $helper = Join-Path $diagnostic_dir 'helper.bash'
+          $inner_test = Join-Path $diagnostic_dir 'inner.bats'
+          $outer_test = Join-Path $diagnostic_dir 'outer.bats'
+
+          @'
+          report_environment() {
+            local context="$1"
+            printf '%s BATS_ROOT=%s\n' "$context" "$BATS_ROOT"
+            printf '%s BATS_LIBEXEC=%s\n' "$context" "$BATS_LIBEXEC"
+            printf '%s BATS_SAVED_PATH=%s\n' "$context" "$BATS_SAVED_PATH"
+            printf '%s PATH=%s\n' "$context" "$PATH"
+            printf '%s bats command:\n' "$context"
+            type -a bats || true
+          }
+          '@ | Set-Content -NoNewline $helper
+
+          @'
+          load 'helper'
+
+          @test "report nested Bats environment" {
+            report_environment nested
+          }
+          '@ | Set-Content -NoNewline $inner_test
+
+          @'
+          load 'helper'
+
+          @test "report outer Bats environment" {
+            report_environment outer
+            run bats --show-output-of-passing-tests "$DIAGNOSTIC_INNER"
+            printf 'nested run status=%s\n' "$status"
+            printf '%s\n' "$output"
+          }
+          '@ | Set-Content -NoNewline $outer_test
+
+          $inner_test_for_bash = (& bash -c 'cygpath -u "$1"' -- $inner_test).Trim()
+          $outer_test_for_bash = (& bash -c 'cygpath -u "$1"' -- $outer_test).Trim()
+          $env:DIAGNOSTIC_INNER = $inner_test_for_bash
+          Write-Output '--- PowerShell npm shim ---'
+          & bats --show-output-of-passing-tests $outer_test_for_bash
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+
+          $npm_prefix = npm prefix -g
+          $installed_bats = Join-Path $npm_prefix 'node_modules\@bats-hardened\bats\bin\bats'
+          Write-Output '--- Installed Bash entry point ---'
+          & bash -c 'installed_bats=$(cygpath -u "$1"); exec "$installed_bats" --show-output-of-passing-tests "$2"' -- $installed_bats $outer_test_for_bash
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
       - name: Run installed package without the npm PowerShell shim
         shell: pwsh
         run: |
