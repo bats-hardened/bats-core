@@ -23,9 +23,9 @@ jobs:
         run: |
           set -euo pipefail
           if [[ "$RELEASE_TAG" == *-* ]]; then
-            npm publish --ignore-scripts --tag next
+            npm publish --ignore-scripts --access public --tag next
           else
-            npm publish --ignore-scripts
+            npm publish --ignore-scripts --access public
           fi
 
   github-npm:
