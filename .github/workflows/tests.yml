@@ -4,13 +4,10 @@ name: Tests
 on:
   workflow_call:
   pull_request:
-    branches:
-      - main
-      - master
   push:
     branches:
-      - main
-      - master
+      - "**"
+      - "!dependabot/**"
   workflow_dispatch:
 
 # Group runs by workflow and PR/ref; release-triggered runs use a separate
