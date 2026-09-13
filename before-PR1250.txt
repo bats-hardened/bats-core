@@ -1,0 +1,17 @@
+1..4
+not ok 1 missing helper after successful load
+# (in test file test/fixtures/load/failing_load_after_success.bats, line 2)
+#   `load test_helper' failed
+# bats_load_safe: Could not find '/home/stefan/development/github/bats-core/bats-core/test/fixtures/load/nonexistent'[.bash]
+not ok 2 helper returning nonzero after successful load
+# (in test file test/fixtures/load/failing_load_after_success.bats, line 8)
+#   `load return1' failed
+# Error while sourcing library loader at '/home/stefan/development/github/bats-core/bats-core/test/fixtures/load/return1.bash'
+not ok 3 missing library after successful load
+# (in test file test/fixtures/load/failing_load_after_success.bats, line 12)
+#   `bats_load_library "$BATS_TEST_DIRNAME/test_helper.bash"' failed
+# Could not find library on absolute path '/home/stefan/development/github/bats-core/bats-core/test/fixtures/load/nonexistent.bash'
+not ok 4 library returning nonzero after successful load
+# (in test file test/fixtures/load/failing_load_after_success.bats, line 18)
+#   `bats_load_library "$BATS_TEST_DIRNAME/return1.bash"' failed
+# Error while sourcing library loader at '/home/stefan/development/github/bats-core/bats-core/test/fixtures/load/return1.bash'
