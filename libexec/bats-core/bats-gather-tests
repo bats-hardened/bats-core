@@ -307,30 +307,24 @@ bats_gather_tests_source_exit_trap() {
   exit "$bats_gather_tests_source_exit_status"
 }
 
-bats_find_duplicate_test_indices() { # <test count>
+bats_find_duplicate_test_indices() {
   # Input: "<index><tab><shell-escaped test identity>", one per line.
   # Output: the index of every occurrence after the first, in numeric order.
-  local test_count=$1
   local sorted_test_names_file="$BATS_RUN_TMPDIR/gather-tests-sorted-test-names"
-  local duplicate_test_indices=()
-  local test_index sorted_test_index test_name_key previous_test_name_key
+  local sorted_test_index test_name_key previous_test_name_key
   local have_previous_test_name=0
 
   LC_ALL=C sort -t $'\t' -k2,2 -k1,1n >|"$sorted_test_names_file"
 
-  while IFS=$'\t' read -r sorted_test_index test_name_key; do
-    if (( have_previous_test_name )) && [[ $test_name_key == "$previous_test_name_key" ]]; then
-      duplicate_test_indices[sorted_test_index]=1
-    fi
-    previous_test_name_key=$test_name_key
-    have_previous_test_name=1
-  done <"$sorted_test_names_file"
-
-  for ((test_index = 0; test_index < test_count; ++test_index)); do
-    if [[ ${duplicate_test_indices[$test_index]-} ]]; then
-      printf '%d\n' "$test_index"
-    fi
-  done
+  {
+    while IFS=$'\t' read -r sorted_test_index test_name_key; do
+      if (( have_previous_test_name )) && [[ $test_name_key == "$previous_test_name_key" ]]; then
+        printf '%d\n' "$sorted_test_index"
+      fi
+      previous_test_name_key=$test_name_key
+      have_previous_test_name=1
+    done <"$sorted_test_names_file"
+  } | sort -n
 }
 
 bats_gather_tests_for_file() {
@@ -352,7 +346,7 @@ bats_gather_tests_for_file() {
         # %q keeps each identity on one physical line.
         printf '%d\t%q\n' "$test_index" "${test_names[$test_index]}"
       done
-    } | bats_find_duplicate_test_indices "${#test_names[@]}" >|"$duplicate_indices_file"
+    } | bats_find_duplicate_test_indices >|"$duplicate_indices_file"
 
     while IFS= read -r test_index; do
       test_dupes+=("${test_names[$test_index]}")
