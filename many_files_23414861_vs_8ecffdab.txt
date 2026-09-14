@@ -1,0 +1,95 @@
+Repository:       /home/stefan/development/github/bats-core/bats-core
+Before revision:  23414861 (2341486183f0b00a6e420770e1f2148758d29377)
+After revision:   8ecffdab (8ecffdabe6b9b932786b2c9156d36a8b62865df8)
+File counts:      100 500 1000
+Tests per file:   1 2 5
+Runs per case:    3
+Temporary root:   /tmp/bats-many-files-benchmark.54iwoe
+Before tree:      /tmp/bats-many-files-benchmark.54iwoe/before
+After tree:       /tmp/bats-many-files-benchmark.54iwoe/after
+Generated suites: /tmp/bats-many-files-benchmark.54iwoe/suites
+Raw results:      /tmp/bats-many-files-benchmark.54iwoe/raw
+
+Generating benchmark suites...
+Generated 100 files x 1 tests: /tmp/bats-many-files-benchmark.54iwoe/suites/files-100-tests-1
+Generated 500 files x 1 tests: /tmp/bats-many-files-benchmark.54iwoe/suites/files-500-tests-1
+Generated 1000 files x 1 tests: /tmp/bats-many-files-benchmark.54iwoe/suites/files-1000-tests-1
+Generated 100 files x 2 tests: /tmp/bats-many-files-benchmark.54iwoe/suites/files-100-tests-2
+Generated 500 files x 2 tests: /tmp/bats-many-files-benchmark.54iwoe/suites/files-500-tests-2
+Generated 1000 files x 2 tests: /tmp/bats-many-files-benchmark.54iwoe/suites/files-1000-tests-2
+Generated 100 files x 5 tests: /tmp/bats-many-files-benchmark.54iwoe/suites/files-100-tests-5
+Generated 500 files x 5 tests: /tmp/bats-many-files-benchmark.54iwoe/suites/files-500-tests-5
+Generated 1000 files x 5 tests: /tmp/bats-many-files-benchmark.54iwoe/suites/files-1000-tests-5
+
+Validating both archived revisions with 100 gathered tests...
+Validation passed.
+
+before files=100   tests/file=1   run=1  0.653 s
+after  files=100   tests/file=1   run=1  0.655 s
+after  files=100   tests/file=1   run=2  0.668 s
+before files=100   tests/file=1   run=2  0.674 s
+before files=100   tests/file=1   run=3  0.659 s
+after  files=100   tests/file=1   run=3  0.654 s
+before files=500   tests/file=1   run=1  3.250 s
+after  files=500   tests/file=1   run=1  3.262 s
+after  files=500   tests/file=1   run=2  3.272 s
+before files=500   tests/file=1   run=2  3.280 s
+before files=500   tests/file=1   run=3  3.293 s
+after  files=500   tests/file=1   run=3  3.262 s
+before files=1000  tests/file=1   run=1  6.656 s
+after  files=1000  tests/file=1   run=1  6.658 s
+after  files=1000  tests/file=1   run=2  6.652 s
+before files=1000  tests/file=1   run=2  6.646 s
+before files=1000  tests/file=1   run=3  6.639 s
+after  files=1000  tests/file=1   run=3  6.642 s
+before files=100   tests/file=2   run=1  0.952 s
+after  files=100   tests/file=2   run=1  1.246 s
+after  files=100   tests/file=2   run=2  1.259 s
+before files=100   tests/file=2   run=2  0.950 s
+before files=100   tests/file=2   run=3  0.947 s
+after  files=100   tests/file=2   run=3  1.241 s
+before files=500   tests/file=2   run=1  4.702 s
+after  files=500   tests/file=2   run=1  6.316 s
+after  files=500   tests/file=2   run=2  6.295 s
+before files=500   tests/file=2   run=2  4.716 s
+before files=500   tests/file=2   run=3  4.748 s
+after  files=500   tests/file=2   run=3  6.287 s
+before files=1000  tests/file=2   run=1  9.555 s
+after  files=1000  tests/file=2   run=1  12.704 s
+after  files=1000  tests/file=2   run=2  12.717 s
+before files=1000  tests/file=2   run=2  9.482 s
+before files=1000  tests/file=2   run=3  9.527 s
+after  files=1000  tests/file=2   run=3  12.687 s
+before files=100   tests/file=5   run=1  1.808 s
+after  files=100   tests/file=5   run=1  2.202 s
+after  files=100   tests/file=5   run=2  2.198 s
+before files=100   tests/file=5   run=2  1.809 s
+before files=100   tests/file=5   run=3  1.813 s
+after  files=100   tests/file=5   run=3  2.183 s
+before files=500   tests/file=5   run=1  8.989 s
+after  files=500   tests/file=5   run=1  11.008 s
+after  files=500   tests/file=5   run=2  11.015 s
+before files=500   tests/file=5   run=2  9.078 s
+before files=500   tests/file=5   run=3  9.059 s
+after  files=500   tests/file=5   run=3  11.025 s
+before files=1000  tests/file=5   run=1  18.235 s
+after  files=1000  tests/file=5   run=1  22.099 s
+after  files=1000  tests/file=5   run=2  22.194 s
+before files=1000  tests/file=5   run=2  18.125 s
+before files=1000  tests/file=5   run=3  18.035 s
+after  files=1000  tests/file=5   run=3  22.100 s
+
+Median elapsed seconds:
+files      tests/file         before        after
+100        1                   0.659        0.655
+500        1                   3.280        3.262
+1000       1                   6.646        6.652
+100        2                   0.950        1.246
+500        2                   4.716        6.295
+1000       2                   9.527       12.704
+100        5                   1.809        2.198
+500        5                   9.059       11.015
+1000       5                  18.125       22.100
+
+Results table:      /tmp/bats-many-files-benchmark.54iwoe/results.tsv
+Artifacts retained: /tmp/bats-many-files-benchmark.54iwoe
