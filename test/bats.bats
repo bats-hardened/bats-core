@@ -40,10 +40,15 @@ setup() {
   [ "$(expr "$output" : ".*does not exist")" -ne 0 ]
 }
 
-@test "empty test file runs zero tests" {
-  reentrant_run bats "$FIXTURE_ROOT/empty.bats"
-  [ $status -eq 0 ]
-  [ "$output" = "1..0" ]
+@test "empty test file runs zero tests but returns non-zero exit code" {
+  bats_require_minimum_version 1.5.0
+  reentrant_run --separate-stderr -1 bats "$FIXTURE_ROOT/empty.bats"
+
+  [ "${lines[0]}" = "1..0" ]
+  [ "${#lines[@]}" -eq 1 ]
+
+  [ "${stderr_lines[0]}" = "ERROR: Found no tests. Use \`--allow-empty-suite\` or \`BATS_ALLOW_EMPTY_SUITE=1\` to suppress this error." ]
+  [ "${#stderr_lines[@]}" -eq 1 ]
 }
 
 @test "one passing test" {
@@ -522,6 +527,24 @@ END_OF_ERR_MSG
   [[ "${lines[1]}" == "ok 1 test 1" ]]
   [[ "${lines[2]}" == "ok 2 test 2 with	TAB in name" ]]
   [[ "${lines[3]}" == "ok 3 test 3" ]]
+}
+
+@test "test names with non-ASCII characters run under a UTF-8 locale (see #1233)" {
+  if ! locale -a 2>/dev/null | grep -qi '^en_US\.utf-\?8$'; then
+    skip "en_US.UTF-8 locale is not available on this system"
+  fi
+
+  # shellcheck disable=SC2030,SC2031
+  REENTRANT_RUN_PRESERVE+=(LC_ALL)
+  LC_ALL=en_US.UTF-8 reentrant_run --separate-stderr bats "$FIXTURE_ROOT/non_ascii_test_names.bats"
+  [ "$status" -eq 0 ]
+  [ "${lines[0]}" = "1..6" ]
+  # all 6 tests must actually run (none may be silently skipped/"ghosted"
+  # due to locale-dependent [[:alnum:]] matching in bats_encode_test_name)
+  local ok_count
+  ok_count="$(grep -c '^ok ' <<<"$output")"
+  [ "$ok_count" -eq 6 ]
+  [ -z "$stderr" ]
 }
 
 @test "report correct line on unset variables" {
@@ -1280,6 +1303,7 @@ END_OF_ERR_MSG
   else
     normalize_variable_list() {
       # `declare -p`: declare -X VAR_NAME="VALUE"
+      # shellcheck disable=SC2030 # false positive `$_` (see https://github.com/koalaman/shellcheck/issues/3478)
       while IFS=' =' read -r _declare _ variable _; do
         if [[ "$_declare" == declare ]]; then # skip multiline variables' values
           printf "%s\n" "$variable"
@@ -1675,6 +1699,62 @@ END_OF_ERR_MSG
   [[ "${lines[3]}" =~ "Step 2: should not appear with errexit" ]]
   [ "${lines[4]}" == "ok 2 passing function works" ]
   [ "${#lines[@]}" == 5 ]
+}
+
+@test "Bats's DEBUG trap should not overwrite \$_ (#1208)" {
+  # set $_
+  : '<lastarg#1208>'
+
+  # shellcheck disable=SC2031 # see https://github.com/koalaman/shellcheck/issues/3478
+  [ "$_" == '<lastarg#1208>' ] # check that $_ is preserved
+}
+
+@test "--allow-empty-suite fails when there are tests" {
+  bats_require_minimum_version 1.5.0
+  reentrant_run -0 bats --allow-empty-suite "$FIXTURE_ROOT/passing.bats"
+}
+
+@test "--allow-empty-suite exits successfully on empty suite" {
+  bats_require_minimum_version 1.5.0
+  reentrant_run --separate-stderr -0 bats --allow-empty-suite "$FIXTURE_ROOT/empty.bats"
+
+  [ "${lines[0]}" = "1..0" ]
+  [ "${#lines[@]}" -eq 1 ]
+  [ "${#stderr_lines[@]}" -eq 0 ]
+}
+
+@test "BATS_ALLOW_EMPTY_SUITE exits successfully on empty suite" {
+  bats_require_minimum_version 1.5.0
+  reentrant_run --separate-stderr -0 env BATS_ALLOW_EMPTY_SUITE=1 bats "$FIXTURE_ROOT/empty.bats"
+
+  [ "${lines[0]}" = "1..0" ]
+  [ "${#lines[@]}" -eq 1 ]
+  [ "${#stderr_lines[@]}" -eq 0 ]
+}
+
+@test "empty BATS_ALLOW_EMPTY_SUITE does not allow an empty suite" {
+  bats_require_minimum_version 1.5.0
+  reentrant_run --separate-stderr -1 env BATS_ALLOW_EMPTY_SUITE= bats "$FIXTURE_ROOT/empty.bats"
+
+  [ "${lines[0]}" = "1..0" ]
+  [ "${stderr_lines[0]}" = "ERROR: Found no tests. Use \`--allow-empty-suite\` or \`BATS_ALLOW_EMPTY_SUITE=1\` to suppress this error." ]
+}
+
+@test "BATS_ALLOW_EMPTY_SUITE does not fail when there are tests" {
+  bats_require_minimum_version 1.5.0
+  reentrant_run -0 env BATS_ALLOW_EMPTY_SUITE=1 bats "$FIXTURE_ROOT/passing.bats"
+}
+
+@test "empty testfile path is an error" {
+  bats_require_minimum_version 1.5.0
+
+  reentrant_run -1 bats ""
+  [ "${lines[0]}" = "Error: File path must not be empty! (Path number 1)" ]
+  [ ${#lines[@]} -eq 1 ]
+
+  reentrant_run -1 bats "$FIXTURE_ROOT/passing.bats" ""
+  [ "${lines[0]}" = "Error: File path must not be empty! (Path number 2)" ]
+  [ ${#lines[@]} -eq 1 ]
 }
 
 @test "prevent name collisions with test functions (#923)" {
