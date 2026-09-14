@@ -9,6 +9,16 @@ record_args() {
   } >>"${REGISTRATION_LOG:?}"
 }
 
+if [[ ${REGISTRATION_WITHOUT_AWK-} ]]; then
+  command() {
+    # Force duplicate detection's `command -v awk` check to use its sort fallback.
+    if [[ ${1-} == -v && ${2-} == awk ]]; then
+      return 1
+    fi
+    builtin command "$@"
+  }
+fi
+
 register_duplicates_with_ifs() {
   local IFS=$1
   bats_test_function --description "first" -- record_args one

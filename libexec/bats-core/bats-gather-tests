@@ -307,6 +307,48 @@ bats_gather_tests_source_exit_trap() {
   exit "$bats_gather_tests_source_exit_status"
 }
 
+bats_find_duplicate_test_indices_with_sort() { # <test count>
+  local test_count=$1
+  local tab=$'\t'
+  local sorted_test_names_file="$BATS_RUN_TMPDIR/gather-tests-sorted-test-names"
+  local duplicate_test_indices=()
+  local test_index sorted_test_index test_name_key previous_test_name_key
+  local have_previous_test_name=0
+
+  # Group equal identities together: field 2 is the encoded identity. Use the
+  # numeric registration index in field 1 as the tie-breaker, making the first
+  # registration the first record in each group.
+  LC_ALL=C sort -t "$tab" -k2,2 -k1,1n >|"$sorted_test_names_file"
+
+  # Mark every record after the first in a group as a duplicate. Read from a
+  # file because a pipeline would run this loop in a subshell on Bash 3.
+  while IFS=$'\t' read -r sorted_test_index test_name_key; do
+    if (( have_previous_test_name )) && [[ $test_name_key == "$previous_test_name_key" ]]; then
+      duplicate_test_indices[sorted_test_index]=1
+    fi
+    previous_test_name_key=$test_name_key
+    have_previous_test_name=1
+  done <"$sorted_test_names_file"
+
+  # Emit the marked indices in registration order for duplicate reporting.
+  for ((test_index = 0; test_index < test_count; ++test_index)); do
+    if [[ ${duplicate_test_indices[$test_index]-} ]]; then
+      printf '%d\n' "$test_index"
+    fi
+  done
+}
+
+bats_find_duplicate_test_indices() { # <test count>
+  # Input is one "index<TAB>shell-escaped test identity" record per line.
+  # Output is the index of each duplicate in registration order.
+  if command -v awk >/dev/null 2>&1; then
+    # Track each encoded identity and print the index of every later occurrence.
+    command awk -F $'\t' 'seen[$2]++ { print $1 }'
+  else
+    bats_find_duplicate_test_indices_with_sort "$1"
+  fi
+}
+
 bats_gather_tests_for_file() {
   local test_names=() test_dupes=() included_tests=() excluded_tests=()
   local duplicate_indices_file test_index
@@ -320,20 +362,13 @@ bats_gather_tests_for_file() {
   BATS_TEST_DIRNAME="${filename%/*}" source "$BATS_TEST_SOURCE" 1>>"$BATS_OUT" 2>&1
 
   if (( ${#test_names[@]} > 1 )); then
-    # Bash 3 has no associative arrays. Quote each identity into a single-line
-    # awk key and return array indices so the original values need no decoding.
     duplicate_indices_file="$BATS_RUN_TMPDIR/gather-tests-duplicate-indices"
     {
       for ((test_index = 0; test_index < ${#test_names[@]}; ++test_index)); do
-        printf '%d %q\n' "$test_index" "${test_names[$test_index]}"
+        # %q keeps identities containing whitespace on one physical input line.
+        printf '%d\t%q\n' "$test_index" "${test_names[$test_index]}"
       done
-    } | command awk '{
-      test_index = $1
-      sub(/^[0-9]+ /, "")
-      if (seen[$0]++) {
-        print test_index
-      }
-    }' >|"$duplicate_indices_file"
+    } | bats_find_duplicate_test_indices "${#test_names[@]}" >|"$duplicate_indices_file"
 
     while IFS= read -r test_index; do
       test_dupes+=("${test_names[$test_index]}")
