@@ -1600,6 +1600,19 @@ END_OF_ERR_MSG
   [ ! -s "$log" ]
 }
 
+@test "dynamic duplicate detection falls back to sort without awk" {
+  reentrant_run env REGISTRATION_WITHOUT_AWK=1 REGISTRATION_CASE=long-first \
+    bats -c "$FIXTURE_ROOT/dynamic_test_registration_prefix.bats"
+  [ "$status" -eq 0 ]
+  [ "$output" -eq 2 ]
+
+  reentrant_run env REGISTRATION_WITHOUT_AWK=1 REGISTRATION_CASE=duplicate \
+    bats -c "$FIXTURE_ROOT/dynamic_test_registration_prefix.bats"
+  [ "$status" -eq 1 ]
+  [[ $output == 'ERROR: Duplicate test name(s) in file '* ]]
+  [[ $output == *'record_args\ --format\ plain' ]]
+}
+
 @test "dynamic duplicate detection is independent of the array join separator" {
   local registration_case
   local log="$BATS_TEST_TMPDIR/registration.log"
