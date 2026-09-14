@@ -529,6 +529,24 @@ END_OF_ERR_MSG
   [[ "${lines[3]}" == "ok 3 test 3" ]]
 }
 
+@test "test names with non-ASCII characters run under a UTF-8 locale (see #1233)" {
+  if ! locale -a 2>/dev/null | grep -qi '^en_US\.utf-\?8$'; then
+    skip "en_US.UTF-8 locale is not available on this system"
+  fi
+
+  # shellcheck disable=SC2030,SC2031
+  REENTRANT_RUN_PRESERVE+=(LC_ALL)
+  LC_ALL=en_US.UTF-8 reentrant_run --separate-stderr bats "$FIXTURE_ROOT/non_ascii_test_names.bats"
+  [ "$status" -eq 0 ]
+  [ "${lines[0]}" = "1..6" ]
+  # all 6 tests must actually run (none may be silently skipped/"ghosted"
+  # due to locale-dependent [[:alnum:]] matching in bats_encode_test_name)
+  local ok_count
+  ok_count="$(grep -c '^ok ' <<<"$output")"
+  [ "$ok_count" -eq 6 ]
+  [ -z "$stderr" ]
+}
+
 @test "report correct line on unset variables" {
   LANG=C reentrant_run bats "$FIXTURE_ROOT/unbound_variable.bats"
   [ "$status" -eq 1 ]
