@@ -97,6 +97,18 @@ bats_test_function() {
     return 0
   fi
 
+  # dereferencing ${test_names[*]} fails on older bash versions when empty -> check before
+  # A space-joined array can rule out matches, but prefixes are not duplicates.
+  if [[ ${#test_names[@]} -gt 0 &&
+    (${IFS-' '} != ' '* || " ${test_names[*]} " == *" $line "*) ]]; then
+    local existing_test_name
+    for existing_test_name in "${test_names[@]}"; do
+      if [[ "$existing_test_name" == "$line" ]]; then
+        test_dupes+=("$line")
+        break
+      fi
+    done
+  fi
   test_names+=("$line")
 
   local args
@@ -307,29 +319,8 @@ bats_gather_tests_source_exit_trap() {
   exit "$bats_gather_tests_source_exit_status"
 }
 
-bats_find_duplicate_test_indices() {
-  # Input: "<index><tab><shell-escaped test identity>", one per line.
-  # Output: the index of every occurrence after the first, in numeric order.
-  local sorted_test_names_file="$BATS_RUN_TMPDIR/gather-tests-sorted-test-names"
-  local sorted_test_index test_name_key previous_test_name_key
-  local have_previous_test_name=0
-
-  LC_ALL=C sort -t $'\t' -k2,2 -k1,1n >|"$sorted_test_names_file"
-
-  {
-    while IFS=$'\t' read -r sorted_test_index test_name_key; do
-      if (( have_previous_test_name )) && [[ $test_name_key == "$previous_test_name_key" ]]; then
-        printf '%d\n' "$sorted_test_index"
-      fi
-      previous_test_name_key=$test_name_key
-      have_previous_test_name=1
-    done <"$sorted_test_names_file"
-  } | sort -n
-}
-
 bats_gather_tests_for_file() {
   local test_names=() test_dupes=() included_tests=() excluded_tests=()
-  local duplicate_indices_file test_index
 
   trap bats_gather_tests_source_exit_trap EXIT
   bats_setup_tracing
@@ -338,20 +329,6 @@ bats_gather_tests_for_file() {
   # do the actual evaluation for gathering the tests
   # shellcheck disable=SC1090
   BATS_TEST_DIRNAME="${filename%/*}" source "$BATS_TEST_SOURCE" 1>>"$BATS_OUT" 2>&1
-
-  if (( ${#test_names[@]} > 1 )); then
-    duplicate_indices_file="$BATS_RUN_TMPDIR/gather-tests-duplicate-indices"
-    {
-      for ((test_index = 0; test_index < ${#test_names[@]}; ++test_index)); do
-        # %q keeps each identity on one physical line.
-        printf '%d\t%q\n' "$test_index" "${test_names[$test_index]}"
-      done
-    } | bats_find_duplicate_test_indices >|"$duplicate_indices_file"
-
-    while IFS= read -r test_index; do
-      test_dupes+=("${test_names[$test_index]}")
-    done <"$duplicate_indices_file"
-  fi
 
   if [[ "${#test_dupes[@]}" -ne 0 ]]; then
     printf 'file_duplicate_test_names="%q"\n' "${test_dupes[*]#$filename$'\t'}"
