@@ -1,0 +1,18 @@
+# Rejects lookup, works in browser. Maybe because there are no projects
+^https://github.com/bats-core/bats-core/projects$
+# Needs authentication
+^https://gitter.im/.*$
+# Stack Overflow rejects lychee lookup
+^https://stackoverflow.com/a/.*$
+# Stack Exchange rejects lychee lookup
+^https://unix.stackexchange.com/a/.*$
+# FSF rejects lychee lookup
+^https://www.fsf.org/$
+# opensuse rejects lychee lookup
+^https://software.opensuse.org/package/.*$
+# npmjs.com rejects lychee lookup
+^https://www.npmjs.com/package/.*$
+# artstation.com rejects lychee lookup
+^https://www.artstation.com/vukory$
+# errors with "too many requests"
+^https://www.gnu.org/software/parallel/$
