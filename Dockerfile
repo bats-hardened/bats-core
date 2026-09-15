@@ -42,6 +42,10 @@ RUN ln -s "$(/usr/bin/env which bash)" "/bin/bash"
 RUN ln -s /opt/bats/bin/bats /usr/local/bin/bats
 COPY . /opt/bats/
 
+RUN addgroup -g "$GID" -S bats && \
+    adduser -u "$UID" -S bats -G bats -s "/bin/bash" && \
+    chown bats:bats /code
+
 WORKDIR /code/
 
 ENTRYPOINT ["/tini", "--", "/usr/local/bin/bash", "/usr/local/bin/bats"]
@@ -51,3 +55,5 @@ FROM base AS test
 RUN apk add --no-cache util-linux # get script
 
 FROM base AS prod
+
+USER "$UID"
