@@ -130,9 +130,8 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: npm pack ./
-      - run: |
-          # shellcheck disable=SC1036,SC1088
-          npm install -g (get-item .\bats-*.tgz).FullName
+      - run: npm install -g (Get-Item .\bats-*.tgz).FullName
+        shell: pwsh
       - run: bats  -T --print-output-on-failure test
 
   macos:
