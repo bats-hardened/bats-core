@@ -1,5 +1,6 @@
 /compose.override.yaml
 /docs/build
+/.megalinter-python-deps/
 
 # npm
 /bats-*.tgz

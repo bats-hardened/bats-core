@@ -1,5 +1,20 @@
 FORMATTERS_DISABLE_ERRORS: false
 
+# Python
+PRE_COMMANDS:
+  - command: >-
+      python -m pip install --upgrade
+      --target .megalinter-python-deps
+      -r docs/source/requirements.txt &&
+      export PYTHONPATH="$PWD/.megalinter-python-deps"
+    cwd: workspace
+    run_before_linters: true
+    continue_if_failed: false
+    output_variables:
+      - PYTHONPATH
+PYTHON_PYLINT_CONFIG_FILE: LINTER_DEFAULT
+PYTHON_PYLINT_ARGUMENTS: "--errors-only"
+
 # bash-exec
 BASH_EXEC_FILE_EXTENSIONS: [".sh", ".dash", ".ksh"]
 
