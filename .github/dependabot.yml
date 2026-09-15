@@ -45,3 +45,12 @@ updates:
       - npm
       - dependencies
       - no changelog
+
+  - package-ecosystem: pre-commit
+    directory: /
+    schedule:
+      interval: daily
+    labels:
+      - pre-commit
+      - dependencies
+      - no changelog
