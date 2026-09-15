@@ -1,0 +1,32 @@
+name: MegaLinter
+
+on:
+  workflow_dispatch:
+    inputs:
+      fix_mode:
+        description: How to publish autofixes for this run
+        required: false
+        default: pull_request
+        type: choice
+        options:
+          - none
+          - pull_request
+      runner:
+        description: Runner used for this run
+        required: false
+        default: ubuntu-latest
+        type: choice
+        options:
+          - ubuntu-latest
+          - self-hosted
+
+permissions: {}
+
+jobs:
+  megalinter:
+    name: Run MegaLinter
+    uses: bats-hardened/.github/.github/workflows/megalinter.yml@44fd251ecb1b4ca6fd2537eaa65be75b9be0395d # v1.1.1-beta01
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
