@@ -78,7 +78,7 @@ For the paranoid, use `npm pack` and install the resulting tarball locally with
 The basic instructions are in the [Submit a new version of an existing
 formula][brew] section of the Homebrew docs.
 
-[brew]: https://github.com/Homebrew/brew/blob/master/docs/How-To-Open-a-Homebrew-Pull-Request.md#submit-a-new-version-of-an-existing-formula
+[brew]: https://github.com/Homebrew/brew/blob/main/docs/How-To-Open-a-Homebrew-Pull-Request.md#submit-a-new-version-of-an-existing-formula
 
 An example using v1.1.0 (notice that this uses the sha256 sum of the tarball):
 
