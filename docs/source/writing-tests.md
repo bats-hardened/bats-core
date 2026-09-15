@@ -270,7 +270,7 @@ because
 
 will only fail the test if it is the last command and thereby determines the test function's exit code.
 This is due to Bash's decision to (counterintuitively?) not trigger `set -e` on `!` commands.
-(See also [the associated gotcha](gotchas.html#my-negated-statement-e-g-true-does-not-fail-the-test-even-when-it-should))
+(See also [the associated gotcha](gotchas.rst#my-negated-statement-e-g-true-does-not-fail-the-test-even-when-it-should))
 
 
 ### `run` and pipes
