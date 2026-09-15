@@ -80,7 +80,7 @@ internal use.
 If a test with the tag `bats:focus` is encountered in a test suite,
 all other tests will be filtered out and only those tagged with this tag will be executed.
 
-In focus mode, the exit code of successful runs will be overridden to 1 to prevent CI from silently running on a subset of tests due to an accidentally committed `bats:focus` tag.    
+In focus mode, the exit code of successful runs will be overridden to 1 to prevent CI from silently running on a subset of tests due to an accidentally committed `bats:focus` tag.
 Should you require the true exit code, e.g. for a `git bisect` operation, you can disable this behavior by setting
 `BATS_NO_FAIL_FOCUS_RUN=1` when running `bats`, but make sure not to commit this to CI!
 
@@ -262,7 +262,7 @@ __Note__: In contrast to the above, testing that a command failed is best done v
 run ! command args ...
 ```
 
-because 
+because
 
 ```bash
 ! command args ...
@@ -272,7 +272,6 @@ will only fail the test if it is the last command and thereby determines the tes
 This is due to Bash's decision to (counterintuitively?) not trigger `set -e` on `!` commands.
 (See also [the associated gotcha](gotchas.html#my-negated-statement-e-g-true-does-not-fail-the-test-even-when-it-should))
 
-
 ### `run` and pipes
 
 Don't fool yourself with pipes when using `run`. Bash parses the pipe outside of `run`, not internal to its command. Take this example:
@@ -281,8 +280,8 @@ Don't fool yourself with pipes when using `run`. Bash parses the pipe outside of
 run command args ... | jq -e '.limit == 42'
 ```
 
-Here, `jq` receives no input (which is captured by `run`), 
-executes no filters, and always succeeds, so the test does not work as 
+Here, `jq` receives no input (which is captured by `run`),
+executes no filters, and always succeeds, so the test does not work as
 expected.
 
 To correctly handle commands with pipes see `bats_pipe`.
@@ -577,7 +576,7 @@ teardown() {
 
 ## `bats::on_failure` hook
 
-While `teardown` unconditionally handles cleanup after the test ends, the `bats::on_failure` hook gets called 
+While `teardown` unconditionally handles cleanup after the test ends, the `bats::on_failure` hook gets called
 only when a test is aborted due to an error. `bats::on_failure` will be called before `teardown`.
 
 You can define `bats::on_failure` anywhere in your test files, even inside the test functions, to change its behavior midtest:
@@ -630,10 +629,11 @@ is not yet upgraded.
 
 In general you should avoid code outside tests, because each test file will be evaluated many times.
 However, there are situations in which this might be useful, e.g. when you want to check for dependencies
-and fail immediately if they're not present. 
+and fail immediately if they're not present.
 
 In general, you should avoid printing outside of `@test`, `setup*` or `teardown*` functions.
 Have a look at section [printing to the terminal](#printing-to-the-terminal) for more details.
+
 ## File descriptor 3 (read this if Bats hangs)
 
 Bats makes a separation between output from the code under test and output that
@@ -652,8 +652,8 @@ complete (eg if the child process is a `sleep 100` command or a background
 service that will run indefinitely), Bats will be similarly blocked for the same
 amount of time.
 
-**To prevent this from happening, close FD 3 explicitly when running any command
-that may launch long-running child processes**, e.g. `command_name 3>&-` .
+__To prevent this from happening, close FD 3 explicitly when running any command
+that may launch long-running child processes__, e.g. `command_name 3>&-` .
 
 ## Printing to the terminal
 
@@ -667,7 +667,7 @@ mentioned in [File descriptor 3](#file-descriptor-3-read-this-if-bats-hangs),
 bats provides a special file descriptor, `&3`, that you should use to print
 your custom text. Here are some detailed guidelines to refer to:
 
-- Printing **from within a test function**:
+- Printing __from within a test function__:
   - First you should consider if you want the text to be always visible or only
     when the test fails. Text that is output directly to stdout or stderr (file
     descriptor 1 or 2), ie `echo 'text'` is considered part of the test function
@@ -680,10 +680,10 @@ your custom text. Here are some detailed guidelines to refer to:
     output. Otherwise, depending on the 3rd-party tools you use to analyze the
     TAP stream, you can encounter unexpected behavior or errors.
 
-- Printing **from within the `setup*` or `teardown*` functions**: The same hold
+- Printing __from within the `setup*` or `teardown*` functions__: The same hold
   true as for printing with test functions.
 
-- Printing **outside test or `setup*`/`teardown*` functions**:
+- Printing __outside test or `setup*`/`teardown*` functions__:
   - You should avoid printing in free code: Due to the multiple executions
     contexts (`setup_file`, multiple `@test`s)  of test files, output
     will be printed more than once.
