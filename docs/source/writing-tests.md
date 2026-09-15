@@ -80,7 +80,8 @@ internal use.
 If a test with the tag `bats:focus` is encountered in a test suite,
 all other tests will be filtered out and only those tagged with this tag will be executed.
 
-In focus mode, the exit code of successful runs will be overridden to 1 to prevent CI from silently running on a subset of tests due to an accidentally committed `bats:focus` tag.    
+In focus mode, the exit code of successful runs will be overridden to 1 to prevent CI from silently running on a subset
+of tests due to an accidentally committed `bats:focus` tag.
 Should you require the true exit code, e.g. for a `git bisect` operation, you can disable this behavior by setting
 `BATS_NO_FAIL_FOCUS_RUN=1` when running `bats`, but make sure not to commit this to CI!
 
@@ -151,7 +152,7 @@ done
 
 giving us the following output:
 
-```
+```text
  ✓ 1 is equal to 1
  ✗ 2 is equal to 1
    (from function `test_body' in test file test.bats, line 2)
@@ -165,7 +166,7 @@ giving us the following output:
 
 Note that the body of the `for` loop uses `$i` but the `test_body` function uses `$1`.
 
-```
+```text
 bats_test_function [--tags <tags>...] [--description <description>] -- [test command...]
 
   --tags <tags...>            comma separated list of tags to apply to the test
@@ -262,7 +263,7 @@ __Note__: In contrast to the above, testing that a command failed is best done v
 run ! command args ...
 ```
 
-because 
+because
 
 ```bash
 ! command args ...
@@ -272,17 +273,17 @@ will only fail the test if it is the last command and thereby determines the tes
 This is due to Bash's decision to (counterintuitively?) not trigger `set -e` on `!` commands.
 (See also [the associated gotcha](gotchas.rst#my-negated-statement-e-g-true-does-not-fail-the-test-even-when-it-should))
 
-
 ### `run` and pipes
 
-Don't fool yourself with pipes when using `run`. Bash parses the pipe outside of `run`, not internal to its command. Take this example:
+Don't fool yourself with pipes when using `run`. Bash parses the pipe outside of `run`, not internal to its command.
+Take this example:
 
 ```bash
 run command args ... | jq -e '.limit == 42'
 ```
 
-Here, `jq` receives no input (which is captured by `run`), 
-executes no filters, and always succeeds, so the test does not work as 
+Here, `jq` receives no input (which is captured by `run`),
+executes no filters, and always succeeds, so the test does not work as
 expected.
 
 To correctly handle commands with pipes see `bats_pipe`.
@@ -512,7 +513,7 @@ If this automatism does not work for your usecase, you can work around by specif
 `--setup-suite-file` on the `bats` command. If you have a `setup_suite.bash`, it must define
 `setup_suite`! However, defining `teardown_suite` is optional.
 
-<!-- markdownlint-disable  MD033 -->
+<!-- markdownlint-disable MD033 -->
 <details>
   <summary>Example of setup/{,_file,_suite} (and teardown{,_file,_suite}) call order</summary>
 For example the following call order would result from two files (file 1 with
@@ -577,7 +578,7 @@ teardown() {
 
 ## `bats::on_failure` hook
 
-While `teardown` unconditionally handles cleanup after the test ends, the `bats::on_failure` hook gets called 
+While `teardown` unconditionally handles cleanup after the test ends, the `bats::on_failure` hook gets called
 only when a test is aborted due to an error. `bats::on_failure` will be called before `teardown`.
 
 You can define `bats::on_failure` anywhere in your test files, even inside the test functions, to change its behavior midtest:
@@ -602,7 +603,8 @@ You can define `bats::on_failure` anywhere in your test files, even inside the t
 }
 ```
 
-The `bats::on_failure` hook is available in `setup_suite`/`setup_file`/`setup`, their respective teardown functions, and test functions.
+The `bats::on_failure` hook is available in `setup_suite`/`setup_file`/`setup`, their respective teardown functions, and
+test functions.
 
 ## `bats_require_minimum_version <Bats version number>`
 
@@ -630,10 +632,11 @@ is not yet upgraded.
 
 In general you should avoid code outside tests, because each test file will be evaluated many times.
 However, there are situations in which this might be useful, e.g. when you want to check for dependencies
-and fail immediately if they're not present. 
+and fail immediately if they're not present.
 
 In general, you should avoid printing outside of `@test`, `setup*` or `teardown*` functions.
 Have a look at section [printing to the terminal](#printing-to-the-terminal) for more details.
+
 ## File descriptor 3 (read this if Bats hangs)
 
 Bats makes a separation between output from the code under test and output that
@@ -652,8 +655,8 @@ complete (eg if the child process is a `sleep 100` command or a background
 service that will run indefinitely), Bats will be similarly blocked for the same
 amount of time.
 
-**To prevent this from happening, close FD 3 explicitly when running any command
-that may launch long-running child processes**, e.g. `command_name 3>&-` .
+__To prevent this from happening, close FD 3 explicitly when running any command
+that may launch long-running child processes__, e.g. `command_name 3>&-` .
 
 ## Printing to the terminal
 
@@ -667,7 +670,7 @@ mentioned in [File descriptor 3](#file-descriptor-3-read-this-if-bats-hangs),
 bats provides a special file descriptor, `&3`, that you should use to print
 your custom text. Here are some detailed guidelines to refer to:
 
-- Printing **from within a test function**:
+- Printing __from within a test function__:
   - First you should consider if you want the text to be always visible or only
     when the test fails. Text that is output directly to stdout or stderr (file
     descriptor 1 or 2), ie `echo 'text'` is considered part of the test function
@@ -680,10 +683,10 @@ your custom text. Here are some detailed guidelines to refer to:
     output. Otherwise, depending on the 3rd-party tools you use to analyze the
     TAP stream, you can encounter unexpected behavior or errors.
 
-- Printing **from within the `setup*` or `teardown*` functions**: The same hold
+- Printing __from within the `setup*` or `teardown*` functions__: The same hold
   true as for printing with test functions.
 
-- Printing **outside test or `setup*`/`teardown*` functions**:
+- Printing __outside test or `setup*`/`teardown*` functions__:
   - You should avoid printing in free code: Due to the multiple executions
     contexts (`setup_file`, multiple `@test`s)  of test files, output
     will be printed more than once.
@@ -729,7 +732,8 @@ There are several global variables you can use to introspect on Bats tests:
 - `$BATS_RUN_TMPDIR` is the location to the temporary directory used by bats to
    store all its internal temporary files during the tests.
    (default: `$BATS_TMPDIR/bats-run-$BATS_ROOT_PID-XXXXXX`)
-- `$BATS_FILE_EXTENSION` (default: `bats`) specifies the extension of test files that should be found when running a suite (via `bats [-r] suite_folder/`)
+- `$BATS_FILE_EXTENSION` (default: `bats`) specifies the extension of test files that should be found when running a
+  suite (via `bats [-r] suite_folder/`)
 - `$BATS_SUITE_TMPDIR` is a temporary directory common to all tests of a suite.
   Could be used to create files required by multiple tests.
 - `$BATS_FILE_TMPDIR` is a temporary directory common to all tests of a test file.
@@ -740,11 +744,13 @@ There are several global variables you can use to introspect on Bats tests:
 
 ## Libraries and Add-ons
 
-Bats supports loading external assertion libraries and helpers. Those under `bats-core` are officially supported libraries (integration tests welcome!):
+Bats supports loading external assertion libraries and helpers. Those under `bats-core` are officially supported
+libraries (integration tests welcome!):
 
 - <https://github.com/bats-core/bats-assert> - common assertions for Bats
 - <https://github.com/bats-core/bats-support> - supporting library for Bats test helpers
 - <https://github.com/bats-core/bats-file> - common filesystem assertions for Bats
 - <https://github.com/bats-core/bats-detik> - e2e tests of applications in K8s environments
 
-Furthermore, you can find a list of [3rd-party libraries](https://github.com/bats-core/bats-core/wiki/3rd%E2%80%90party-Libraries-for-Bats) in our Wiki.
+Furthermore, you can find a list of
+[3rd-party libraries](https://github.com/bats-core/bats-core/wiki/3rd%E2%80%90party-Libraries-for-Bats) in our Wiki.
