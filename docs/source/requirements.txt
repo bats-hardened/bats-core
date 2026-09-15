@@ -1,2 +1,3 @@
-sphinxcontrib-programoutput
-recommonmark
+sphinxcontrib-programoutput==0.20
+recommonmark==0.7.1
+idna==3.19
