@@ -8,18 +8,19 @@ The format is based on [Keep a Changelog][kac] and this project adheres to
 [kac]: https://keepachangelog.com/en/1.0.0/
 [semver]: https://semver.org/
 
-
 ## [Unreleased]
 
 ### Added
 
-* `$BATS_ALLOW_EMPTY_SUITE` environment variable as an alternative to `--allow-empty-suite`, which keeps test setups compatible with Bats versions before 1.14 that don't know the flag (#1240)
+* `$BATS_ALLOW_EMPTY_SUITE` environment variable as an alternative to `--allow-empty-suite`, which keeps test setups
+  compatible with Bats versions before 1.14 that don't know the flag (#1240)
 
 ### Fixed
 
 * pretty formatter was not the default on interactive shells anymore (#1220)
 * `--jobs` now aborts when GNU parallel is unavailable instead of failing later (#1237, #1238)
-* `bats_encode_test_name()` used the locale-dependent `[[:alnum:]]` character class, causing test names with non-ASCII characters to be silently skipped under some locales (#1236)
+* `bats_encode_test_name()` used the locale-dependent `[[:alnum:]]` character class, causing test names with non-ASCII
+  characters to be silently skipped under some locales (#1236)
 * normalize BATS_ROOT from PowerShell on Windows (#1257)
 * normalize BATS_LIB_PATH from PowerShell on Windows (#1258)
 
@@ -48,8 +49,10 @@ The format is based on [Keep a Changelog][kac] and this project adheres to
 * fix failures with `--gather-test-outputs-in` when tests change directory (#1183)
 * `run` now honors `set -e` in your functions (#1118)
   * **ATTENTION**: In previous versions this was suppressed unintentionally.
-    While it might constitute a breaking change for some, we decided the new behavior should be the default because it might uncover hidden errors.
-    If you need the old behavior, you can use this wrapper function `suppress_errexit() { "$@" || return $?; }` like `run suppress_errexit <your command...>`
+    While it might constitute a breaking change for some, we decided the new behavior should be the default because it
+    might uncover hidden errors.
+    If you need the old behavior, you can use this wrapper function `suppress_errexit() { "$@" || return $?; }` like
+    `run suppress_errexit <your command...>`
 * avoid overwriting `$_` by the DEBUG and ERR traps set by Bats (#1208)
 * fail with error when receiving empty string as testfile path (#1212)
 
@@ -66,7 +69,8 @@ The format is based on [Keep a Changelog][kac] and this project adheres to
 
 ### Added
 
-* use the [`syntax`](https://docs.docker.com/reference/dockerfile/#syntax) parser directive to declare the Dockerfile syntax version (#1127)
+* use the [`syntax`](https://docs.docker.com/reference/dockerfile/#syntax) parser directive to declare the Dockerfile
+  syntax version (#1127)
 * Negative test filtering via `--negative-filter` - tests matching the filter are *excluded* (#1114)
 * fail-fast flag `--abort` to stop test suite execution on first failure (#1155)
 
