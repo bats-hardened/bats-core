@@ -1,10 +1,10 @@
 # Contributing Guidelines
 
-## Welcome!
+## Welcome
 
-Thank you for considering contributing to this project's 
+Thank you for considering contributing to this project's
 development and/or documentation. Just a reminder: if you're new to this project
-or to OSS and want to find issues to work on, please check the following labels 
+or to OSS and want to find issues to work on, please check the following labels
 on issues:
 
 - [help wanted][helpwantedlabel]
@@ -21,25 +21,23 @@ To see all labels and their meanings, [check this wiki page][labelswiki].
 
 ## Table of contents
 
-* [Contributing Guidelines](#contributing-guidelines)
-  * [Welcome!](#welcome)
-  * [Table of contents](#table-of-contents)
-  * [Quick links](#quick-links)
-  * [Code of conduct](#code-of-conduct)
-  * [Asking questions](#asking-questions)
-  * [Updating documentation](#updating-documentation)
-  * [Testing](#testing)
-  * [Coding conventions](#coding-conventions)
-      * [Function declarations](#function-declarations)
-      * [Variable and parameter declarations](#variable-and-parameter-declarations)
-      * [Command substitution](#command-substitution)
-      * [Process substitution](#process-substitution)
-      * [Conditionals and loops](#conditionals-and-loops)
-      * [Generating output](#generating-output)
-      * [Signal names](#signal-names)
-      * [Gotchas](#gotchas)
-  * [Open Source License](#open-source-license)
-  * [Credits](#credits)
+- [Contributing Guidelines](#contributing-guidelines)
+  - [Welcome!](#welcome)
+  - [Table of contents](#table-of-contents)
+  - [Quick links](#quick-links)
+  - [Code of conduct](#code-of-conduct)
+  - [Asking questions](#asking-questions)
+  - [Updating documentation](#updating-documentation)
+  - [Testing](#testing)
+  - [Coding conventions](#coding-conventions)
+    - [Function declarations](#function-declarations)
+    - [Variable and parameter declarations](#variable-and-parameter-declarations)
+    - [Command substitution](#command-substitution)
+    - [Process substitution](#process-substitution)
+    - [Conditionals and loops](#conditionals-and-loops)
+    - [Generating output](#generating-output)
+    - [Signal names](#signal-names)
+  - [Credits](#credits)
 
 ## Quick links
 
@@ -66,14 +64,14 @@ specifics, see the [CODE_OF_CONDUCT][] file.
 
 Please check the [documentation][documentation] or existing [discussions][] and [issues][repoissues] first.
 
-If you cannot find an answer to your question, please feel free to hop on our 
+If you cannot find an answer to your question, please feel free to hop on our
 [Gitter][gitterurl]. [![Gitter](https://badges.gitter.im/bats-core/bats-core.svg)](https://gitter.im/bats-core/bats-core)
 
 ## Updating documentation
 
 We love documentation and people who love documentation!
 
-If you love writing clear, accessible docs, please don't be shy about pull 
+If you love writing clear, accessible docs, please don't be shy about pull
 requests. Remember: docs are just as important as code.
 
 Also: _no typo is too small to fix!_ Really. Of course, batches of fixes are
@@ -84,17 +82,19 @@ preferred, but even one nit is one nit too many.
 - Continuous integration status: [![Tests](https://github.com/bats-core/bats-core/workflows/Tests/badge.svg)](https://github.com/bats-core/bats-core/actions?query=workflow%3ATests)
 
 To run all tests:
+
 ```sh
 bin/bats test
 ```
 
 To run a single test file:
+
 ```sh
 bin/bats test/file.bats
 ```
 
-When running from a terminal, Bats uses the *pretty* formatter by default.
-However, to debug Bats you might need to see the raw test output. 
+When running from a terminal, Bats uses the _pretty_ formatter by default.
+However, to debug Bats you might need to see the raw test output.
 The **cat** formatter is intended as an internal debugging tool because
 it does not process test outputs.
 To use it, run Bats with the `--formatter cat` option.
@@ -126,13 +126,16 @@ Use `snake_case` for all identifiers.
   variables.
 - For most functions, the first lines should use `local` declarations to
   assign the original positional parameters to more meaningful names, e.g.:
+
   ```bash
   format_summary() {
     local cmd_name="$1"
     local summary="$2"
     local longest_name_len="$3"
   ```
+
   For very short functions, this _may not_ be necessary, e.g.:
+
   ```bash
   has_spaces() {
     [[ "$1" != "${1//[[:space:]]/}" ]]
@@ -165,7 +168,7 @@ Use `snake_case` for all identifiers.
   loop (which avoids having the loop body execute in a subshell) or running a
   command taking multiple filename arguments based on output from a function or
   pipeline (e.g.  `diff`).
-- *Warning*: It is impossible to directly determine the exit status of a process
+- _Warning_: It is impossible to directly determine the exit status of a process
   substitution; emitting an exit status as the last line of output is a possible
   workaround.
 
@@ -190,9 +193,9 @@ Use `snake_case` for all identifiers.
 
 ### Signal names
 
-Always use upper case signal names (e.g. `trap - INT EXIT`) to avoid locale 
-dependent errors. In some locales (for example Turkish, see 
-[Turkish dotless i](https://en.wikipedia.org/wiki/Dotted_and_dotless_I)) lower 
+Always use upper case signal names (e.g. `trap - INT EXIT`) to avoid locale
+dependent errors. In some locales (for example Turkish, see
+[Turkish dotless i](https://en.wikipedia.org/wiki/Dotted_and_dotless_I)) lower
 case signal names cause Bash to error. An example of the problem:
 
 ```bash
@@ -203,13 +206,12 @@ $ LC_CTYPE=tr_TR.UTF-8 LC_MESSAGES=C bash -c 'trap - INT && echo success'
 success
 ```
 
-
 ## Credits
 
 The [official bash logo](https://github.com/odb/official-bash-logo) is copyrighted
 by the [Free Software Foundation](https://www.fsf.org/), 2016 under the [Free Art License](http://artlibre.org/licence/lal/en/)
 
-This guide borrows **heavily** from [@mbland's go-script-bash][gsb] (with some 
+This guide borrows **heavily** from [@mbland's go-script-bash][gsb] (with some
 sections directly quoted), which in turn was
 drafted with tips from [Wrangling Web Contributions: How to Build
 a CONTRIBUTING.md][moz] and with some inspiration from [the Atom project's
@@ -226,7 +228,5 @@ CONTRIBUTING.md file][atom].
 [repoprs]:        https://github.com/bats-core/bats-core/pulls
 [repoissues]:     https://github.com/bats-core/bats-core/issues
 [repohome]:       https://github.com/bats-core/bats-core
-
-[osmit]:          https://opensource.org/licenses/MIT
 
 [gitterurl]:      https://gitter.im/bats-core/bats-core
