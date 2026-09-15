@@ -47,7 +47,7 @@ jobs:
         env:
           RELEASE_TAG: ${{ github.ref_name }}
           NODE_AUTH_TOKEN: ${{ github.token }}
-        run: |
+        run: | # zizmor: ignore[use-trusted-publishing] GitHub Packages does not support OIDC trusted publishing
           set -euo pipefail
           if [[ "$RELEASE_TAG" == *-* ]]; then
             npm publish --ignore-scripts --tag next
