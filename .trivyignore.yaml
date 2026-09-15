@@ -1,0 +1,11 @@
+misconfigurations:
+  - id: AVD-DS-0001
+    paths:
+      - Dockerfile
+      - .devcontainer/Dockerfile
+    statement: FROM has a specific tag by arg `bashver`}`
+  - id: AVD-DS-0026
+    paths:
+      - Dockerfile
+      - .devcontainer/Dockerfile
+    statement: HEALTHCHECK not needed
