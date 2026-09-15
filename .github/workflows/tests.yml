@@ -24,6 +24,8 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Check that PR is mentioned in Changelog
         run: |
           if ! ./.github/workflows/check_pr_label.sh "${{github.event.pull_request.number}}" "no changelog"; then
@@ -35,6 +37,8 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - run: |
           curl https://github.com/mvdan/sh/releases/download/v3.5.1/shfmt_v3.5.1_linux_amd64 -o shfmt
           chmod a+x shfmt
@@ -46,6 +50,8 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Check failing tests fail suite,
         run: "! bin/bats test/fixtures/bats/failing.bats"
 
@@ -53,6 +59,8 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Run shellcheck
         run: |
           sudo apt-get update -y
@@ -74,6 +82,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install rush
         run: |
           curl -sSfL https://github.com/shenwei356/rush/releases/download/v0.10.0/rush_linux_amd64.tar.gz | sudo tar xzf - -C /usr/local/bin
@@ -90,6 +100,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Check unset variables
         shell: 'script -q -e -c "bash {0}"' # work around tty issues
         env:
@@ -104,6 +116,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - run: npm pack ./
       - run: npm install -g ./bats-*.tgz
       - name: Run test on OS ${{ matrix.os }}
@@ -119,6 +133,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Check failing tests fail suite,
         run: bash -c "! bin/bats test/fixtures/bats/failing.bats"
       - run: |
@@ -132,6 +148,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - run: npm pack ./
       - run: npm install -g (Get-Item .\bats-*.tgz).FullName
         shell: pwsh
@@ -149,6 +167,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install unbuffer via expect
         run: brew install expect
       - name: Install rush
@@ -177,6 +197,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install unbuffer via expect
         run: brew install expect
       - name: Run test on OS ${{ matrix.os }}
@@ -200,6 +222,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Run test on bash version ${{ matrix.version }}
         shell: 'script -q -e -c "bash {0}"' # work around tty issues
         run: |
@@ -215,6 +239,8 @@ jobs:
         pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install in lib64
         run: sudo ./install.sh /usr/ lib64
       - name: Run from env
@@ -236,6 +262,8 @@ jobs:
     container: alpine:latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install dependencies
         run: apk add bash ncurses util-linux
       - name: Run tests on Alpine
@@ -254,6 +282,8 @@ jobs:
           - ""
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: acj/freebsd-firecracker-action@e04896d2dd91f7ec7381e5f363c6fbe83ee445c3 # v0.11.0
         with:
           run-in-vm: |
@@ -265,6 +295,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       # list symlinks that are broken and force non-zero exit if there are any
       - run: "! find . -xtype l | grep ."
 
@@ -273,6 +305,8 @@ jobs:
     container: almalinux:8
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - run: dnf install -y rpm-build rpmdevtools
       - name: Build and install RPM and dependencies
         run: |
@@ -294,6 +328,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Docker Buildx
         id: buildx
@@ -315,16 +351,19 @@ jobs:
         with:
           repository: bats-core/bats-assert
           path: bats-assert
+          persist-credentials: false
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: bats-core/bats-support
           path: bats-support
+          persist-credentials: false
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: bats-core/bats-file
           path: bats-file
+          persist-credentials: false
 
       - run: |
           <<EOF cat >test.sh
@@ -341,6 +380,8 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - run: |
           wget https://github.com/SimonKagstrom/kcov/releases/download/v42/kcov-amd64.tar.gz
           tar -xf kcov-amd64.tar.gz
