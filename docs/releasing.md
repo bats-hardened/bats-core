@@ -23,7 +23,7 @@ with the message `Bats <VERSION>`, where `<VERSION>` is the new version number.
 Create a new signed, annotated tag with:
 
 ```bash
-$ git tag -a -s v<VERSION>
+git tag -a -s v<VERSION>
 ```
 
 Include the `docs/CHANGELOG.md` notes corresponding to the new version as the
@@ -45,7 +45,7 @@ Added:
 Push the new version commit and tag to GitHub via the following:
 
 ```bash
-$ git push --follow-tags
+git push --follow-tags
 ```
 
 Pushing a `v<major>.<minor>.<patch>` tag starts the release workflow. It first
@@ -60,8 +60,8 @@ tags, and creates a GitHub prerelease.
 
 For more on `git push --follow-tags`, see:
 
-* [git push --follow-tags in the online manual][ft-man]
-* [Stack Overflow: How to push a tag to a remote repository using Git?][ft-so]
+- [git push --follow-tags in the online manual][ft-man]
+- [Stack Overflow: How to push a tag to a remote repository using Git?][ft-so]
 
 [ft-man]: https://git-scm.com/docs/git-push#git-push---follow-tags
 [ft-so]: https://stackoverflow.com/a/26438076
@@ -92,7 +92,8 @@ $ brew bump-formula-pr \
   --url=https://github.com/bats-core/bats-core/archive/v1.1.0.tar.gz \
   --sha256=855d8b8bed466bc505e61123d12885500ef6fcdb317ace1b668087364717ea82
 ```
-This resulted in https://github.com/Homebrew/homebrew-core/pull/29864, which was
+
+This resulted in <https://github.com/Homebrew/homebrew-core/pull/29864>, which was
 automatically merged once the build passed.
 
 ## Alpine Linux
@@ -106,7 +107,7 @@ SHA512(v1.1.0.zip)=accd83cfec0025a2be40982b3f9a314c2bbf72f5c85daffa9e9419611904a
 ```
 
 After cloning alpinelinux/aports, I used the above information to create:
-https://github.com/alpinelinux/aports/pull/4696
+<https://github.com/alpinelinux/aports/pull/4696>
 
 **Note:** Currently users must enable the `edge` branch of the `community` repo
 by adding/uncommenting the corresponding entry in `/etc/apk/repositories`.
@@ -118,7 +119,7 @@ Gitter][gitter]:
 
 [gitter]: https://gitter.im/bats-core/bats-core?at=5b42c9a57b811a6d63daacb5
 
-```
+```text
 v1.1.0 is now available via Homebrew and npm:
 https://github.com/bats-core/bats-core/releases/tag/v1.1.0
 

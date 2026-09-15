@@ -21,10 +21,11 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 **Environment (please complete the following information):**
- - Bats version [e.g. 1.4.0 or commit hash if applicable]
- - operating system (including version): [e.g. Linux (please name your distribution!), FreeBSD, MacOS]
- - `bash --version`: [e.g. 5.1]
- - Install method: [e.g. git submodule, distribution package manager, npm, homebrew, ...]
+
+- Bats version [e.g. 1.4.0 or commit hash if applicable]
+- operating system (including version): [e.g. Linux (please name your distribution!), FreeBSD, MacOS]
+- `bash --version`: [e.g. 5.1]
+- Install method: [e.g. git submodule, distribution package manager, npm, homebrew, ...]
 
 **Additional context**
 Add any other context about the problem here.

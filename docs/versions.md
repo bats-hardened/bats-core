@@ -1,3 +1,4 @@
+<!-- markdownlint-disable-next-line MD041 -->
 Here are the docs of following versions:
 
 * [v1.2.0](https://github.com/bats-core/bats-core/blob/v1.2.0/README.md)
