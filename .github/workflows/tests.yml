@@ -369,3 +369,9 @@ jobs:
             echo "  is below required minimum coverage ($minimum_coverage%)." | tee -a "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
+
+  super-linter:
+    name: Run Super-Linter
+    uses: bats-hardened/.github/.github/workflows/super-linter.yml@44fd251ecb1b4ca6fd2537eaa65be75b9be0395d # v1.1.1-beta01
+    permissions:
+      contents: read
