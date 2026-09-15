@@ -1,0 +1,12 @@
+# Look for sourced files relative to the checked script.
+source-path=SCRIPTDIR
+
+# Allow opening any sourced file, even if it was not specified as input.
+external-sources=true
+
+# Disable checks for established test patterns and Bats-specific behavior:
+# - variable assignments appear lost across subshells because each Bats test runs in a separate process (SC2030, SC2031)
+# - BATSLIB_* variables appear unused because library functions read them through dynamic scope (SC2034)
+# - ignore unquoted variables because they are already common throughout the test suite (SC2086)
+# - setup and teardown functions appear unused because Bats calls them automatically (SC2329)
+disable=SC2030,SC2031,SC2034,SC2086,SC2329
