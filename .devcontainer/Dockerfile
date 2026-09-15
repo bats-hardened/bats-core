@@ -15,4 +15,7 @@ RUN echo "@edgecomm http://dl-cdn.alpinelinux.org/alpine/edge/community"  >> /et
 RUN ln -s /opt/bats/bin/bats /usr/sbin/bats
 COPY . /opt/bats/
 
+RUN adduser -D -u 10000 bats
+USER 10000
+
 ENTRYPOINT ["bash", "/usr/sbin/bats"]
