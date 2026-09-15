@@ -50,7 +50,7 @@ jobs:
           else
             rpm_release_version="$rpm_version"
           fi
-          if [[ "$version" != "$package_version" || "$version" != "$bats_version" || "$version" != "$rpm_release_version" ]]; then
+          if ! [[ "$version" == "$package_version" && "$version" == "$bats_version" && "$version" == "$rpm_release_version" ]]; then
             printf 'Tag (%s), package.json (%s), bats (%s), and RPM spec (%s-%s) versions must match.\n' \
               "$version" "$package_version" "$bats_version" "$rpm_version" "$rpm_release" >&2
             exit 1
@@ -123,7 +123,7 @@ jobs:
           if [[ "$RELEASE_TAG" == *-* ]]; then
             release_args+=(--prerelease)
           fi
-          gh release create "$RELEASE_TAG" dist/* \
+          gh release create "$RELEASE_TAG" ./dist/* \
             --repo "$GITHUB_REPOSITORY" \
             --target "$TARGET_SHA" \
             --verify-tag \
