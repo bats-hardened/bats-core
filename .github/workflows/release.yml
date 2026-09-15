@@ -73,7 +73,6 @@ jobs:
       contents: read
       id-token: write
       packages: write
-    secrets: inherit
 
   publish-container-images:
     name: Publish container images
@@ -82,7 +81,9 @@ jobs:
     permissions:
       contents: read
       packages: write
-    secrets: inherit
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
   create-github-release:
     name: Create GitHub release
