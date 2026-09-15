@@ -1,3 +1,4 @@
+<!-- markdownlint-disable-next-line MD041 -->
 [![Latest release](https://img.shields.io/github/release/bats-core/bats-core.svg)](https://github.com/bats-core/bats-core/releases/latest)
 [![npm package](https://img.shields.io/npm/v/bats.svg)](https://www.npmjs.com/package/bats)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/bats-core/bats-core/blob/master/LICENSE.md)
@@ -6,12 +7,14 @@
 
 [![Join the chat in bats-core/bats-core on gitter](https://badges.gitter.im/bats-core/bats-core.svg)][gitter]
 
+<!-- markdownlint-disable MD033 -->
 <div align="center">
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/source/assets/dark_mode_cube.svg">
   <img alt="" src="docs/source/assets/light_mode_cube.svg">
 </picture>
 </div>
+<!-- markdownlint-enable MD033 -->
 
 # Bats-core: Bash Automated Testing System
 
@@ -56,8 +59,8 @@ each line is an assertion of truth.
 - [Contact](#contact)
 - [Version history](#version-history)
 - [Background](#background)
-  * [What's the plan and why?](#whats-the-plan-and-why)
-  * [Why was this fork created?](#why-was-this-fork-created)
+  - [What's the plan and why?](#whats-the-plan-and-why)
+  - [Why was this fork created?](#why-was-this-fork-created)
 - [Copyright](#copyright)
 
 <!-- tocstop -->
@@ -104,7 +107,9 @@ See `docs/CHANGELOG.md`.
 ### Why was this fork created?
 <!-- markdownlint-enable MD026 -->
 
-There was an initial [call for maintainers][call-maintain] for the original Bats repository, but write access to it could not be obtained. With development activity stalled, this fork allowed ongoing maintenance and forward progress for Bats.
+There was an initial [call for maintainers][call-maintain] for the original Bats repository, but write access to it
+could not be obtained. With development activity stalled, this fork allowed ongoing maintenance and forward progress
+for Bats.
 
 **Tuesday, September 19, 2017:** This was forked from [Bats][bats-orig] at
 commit [0360811][].  It was created via `git clone --bare` and `git push
@@ -121,7 +126,9 @@ This [bats-core](https://github.com/bats-core/bats-core) repo is now the communi
 
 ## Copyright
 
-The Bats Logo was created by [Vukory](https://www.artstation.com/vukory) ([Github](https://github.com/vukory)) and sponsored by [SethFalco](https://github.com/SethFalco). If you want to use our logo, have a look at our [guidelines](./docs/source/assets/README.md#Usage-Guide-for-Third-Parties).
+The Bats Logo was created by [Vukory](https://www.artstation.com/vukory) ([Github](https://github.com/vukory)) and
+sponsored by [SethFalco](https://github.com/SethFalco). If you want to use our logo, have a look at our
+[guidelines](./docs/source/assets/README.md#Usage-Guide-for-Third-Parties).
 
 © 2017-2024 bats-core organization
 
