@@ -9,6 +9,9 @@ COPYPASTE_JSCPD_ARGUMENTS: "--threshold 10"
 # shfmt
 BASH_SHFMT_ARGUMENTS: "--indent 2 -case-indent"
 
+# trivy
+REPOSITORY_TRIVY_ARGUMENTS: "--ignorefile ./.trivyignore.yaml"
+
 # zizmor
 ACTION_ZIZMOR_UNSECURED_ENV_VARIABLES:
   - GITHUB_TOKEN
