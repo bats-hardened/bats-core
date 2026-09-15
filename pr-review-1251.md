@@ -1,20 +1,14 @@
-Looks good to me — I support this change.
+Looks good to me — I support this change as it is.
 
 ### Testing
 
-I ran the full GitHub Actions test workflow, including the different Bash
-versions and the macOS and Windows runners. Everything passed.
-
-I also ran the focused checks locally:
-
-- `bin/bats test/bats.bats`: 138 passed, 2 skipped
-- `./shellcheck.sh`: passed
-- `git diff --check`: passed
+I ran the full GitHub Actions test workflow (different Bash
+versions, macOS and Windows runners). shellcheck.sh also passed.
 
 ### Implementation
 
-I took a closer look at why the short-option unpacking was moved into the main
-argument-parsing loop and considered a few alternatives:
+I considered a few alternative ways to structure the short-option unpacking,
+but none looked better than the current implementation. In detail:
 
 - Keeping the old preprocessing pass unchanged would still unpack filenames
   after `--`, defeating the purpose of the terminator.
