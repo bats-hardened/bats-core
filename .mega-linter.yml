@@ -1,0 +1,14 @@
+FORMATTERS_DISABLE_ERRORS: false
+
+# bash-exec
+BASH_EXEC_FILE_EXTENSIONS: [".sh", ".dash", ".ksh"]
+
+# jscpd
+COPYPASTE_JSCPD_ARGUMENTS: "--threshold 10"
+
+# shfmt
+BASH_SHFMT_ARGUMENTS: "--indent 2 -case-indent"
+
+# zizmor
+ACTION_ZIZMOR_UNSECURED_ENV_VARIABLES:
+  - GITHUB_TOKEN
