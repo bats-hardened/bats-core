@@ -511,7 +511,7 @@ If this automatism does not work for your usecase, you can work around by specif
 `--setup-suite-file` on the `bats` command. If you have a `setup_suite.bash`, it must define
 `setup_suite`! However, defining `teardown_suite` is optional.
 
-<!-- markdownlint-disable  MD033 -->
+<!-- markdownlint-disable MD033 -->
 <details>
   <summary>Example of setup/{,_file,_suite} (and teardown{,_file,_suite}) call order</summary>
 For example the following call order would result from two files (file 1 with

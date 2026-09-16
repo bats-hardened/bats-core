@@ -1,11 +1,13 @@
 # Our Logo
 
+<!-- markdownlint-disable MD033 -->
 <div align="center">
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="dark_mode_cube.svg">
   <img alt="" src="light_mode_cube.svg">
 </picture>
 </div>
+<!-- markdownlint-enable MD033 -->
 
 ## Usage Guide for Third Parties
 

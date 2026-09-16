@@ -1,3 +1,4 @@
+<!-- markdownlint-disable-line MD041 -->
 [![Latest release](https://img.shields.io/github/release/bats-core/bats-core.svg)](https://github.com/bats-core/bats-core/releases/latest)
 [![npm package](https://img.shields.io/npm/v/bats.svg)](https://www.npmjs.com/package/bats)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/bats-core/bats-core/blob/master/LICENSE.md)
@@ -6,12 +7,14 @@
 
 [![Join the chat in bats-core/bats-core on gitter](https://badges.gitter.im/bats-core/bats-core.svg)][gitter]
 
+<!-- markdownlint-disable MD033 -->
 <div align="center">
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/source/assets/dark_mode_cube.svg">
   <img alt="" src="docs/source/assets/light_mode_cube.svg">
 </picture>
 </div>
+<!-- markdownlint-enable MD033 -->
 
 # Bats-core: Bash Automated Testing System
 
