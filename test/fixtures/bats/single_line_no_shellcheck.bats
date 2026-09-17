@@ -1,3 +1,4 @@
+# shellcheck disable=all
 @test "empty" { }
 
 @test "passing" { true; }
