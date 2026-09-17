@@ -136,6 +136,7 @@ jobs:
         run: bash -c "! bin/bats test/fixtures/bats/failing.bats"
       - run: |
           bash --version
+          bash -c '[[ ($OSTYPE == msys || $OSTYPE == cygwin) && $(uname -o) == Msys ]]'
           bash -c "time bin/bats -T --print-output-on-failure test"
 
   npm_on_windows:
@@ -143,6 +144,7 @@ jobs:
       matrix:
         os: ['windows-2022', 'windows-2025']
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -150,7 +152,21 @@ jobs:
       - run: npm pack ./
       - run: npm install -g (Get-Item .\bats-*.tgz).FullName
         shell: pwsh
-      - run: bats  -T --print-output-on-failure test
+      - run: bats -T --print-output-on-failure test
+
+  cygwin:
+    runs-on: windows-2025
+    steps:
+      - run: git config --global core.autocrlf input
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: cygwin/cygwin-install-action@3f0a3f9f988f7e96b8c18098ae05eaec175f5b52 # v6.1
+        with:
+          install-dir: C:\cygwin
+      - name: Test paths with Cygwin
+        shell: C:\cygwin\bin\bash.exe --noprofile --norc -e -o igncr -o pipefail {0}
+        run: bin/bats --print-output-on-failure test/load.bats
 
   macos:
     strategy:
