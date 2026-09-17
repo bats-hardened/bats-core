@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-export BATS_VERSION='1.14.1-beta08'
+export BATS_VERSION='1.14.1-alpha09npmwindows'
 VALID_FORMATTERS="pretty, junit, tap, tap13"
 
 version() {
