@@ -144,6 +144,42 @@ setup() {
   reentrant_run ! bats "$FIXTURE_ROOT/bats_load.bats" # load does not use BATS_LIB_PATH!
 }
 
+@test "bats_load_library normalizes Windows-form BATS_LIB_PATH inherited at startup" {
+  if [[ ${OSTYPE-} != cygwin && ${OSTYPE-} != msys ]]; then
+    skip "Run only on Windows"
+  fi
+
+  path_dir="$BATS_TEST_TMPDIR/libraries/$BATS_TEST_NAME"
+  mkdir -p "$path_dir"
+  cp "${FIXTURE_ROOT}/test_helper.bash" "${path_dir}/load.bash"
+  BATS_LIB_PATH="$(cygpath --windows "${BATS_TEST_TMPDIR}/libraries")" \
+    HELPER_NAME="$BATS_TEST_NAME" \
+    reentrant_run -0 "$BATS_ROOT/bin/bats" "$FIXTURE_ROOT/bats_load_library.bats"
+}
+
+@test "bats_load_library honors BATS_LIB_PATH overridden in the test file" {
+  BATS_LIB_PATH="$BATS_TEST_TMPDIR/missing" \
+    reentrant_run -0 "$BATS_ROOT/bin/bats" "$FIXTURE_ROOT/bats_load_library_with_overridden_path.bats"
+}
+
+@test "Bats preserves BATS_LIB_PATH when cygpath is unavailable" {
+  if [[ ${OSTYPE-} != cygwin && ${OSTYPE-} != msys ]]; then
+    skip "Run only on Windows"
+  fi
+
+  command() {
+    if [[ ${1-} == -v && ${2-} == cygpath ]]; then
+      return 1
+    fi
+    builtin command "$@"
+  }
+  eval 'cygpath() { return 127; }'
+  export -f command cygpath
+
+  BATS_LIB_PATH='C:\unconverted' \
+    reentrant_run -0 "$BATS_ROOT/bin/bats" "$FIXTURE_ROOT/cygpath_unavailable.bats"
+}
+
 @test "bats_load_library supports libraries with loaders on the BATS_LIB_PATH with multiple libraries" {
   path_dir="$BATS_TEST_TMPDIR/libraries/"
   for lib in liba libb libc; do
