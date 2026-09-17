@@ -4,8 +4,8 @@
 
 Name:           bats
 Version:        1.14.1
-Release:        0.beta08%{?dist}
-%global upstream_version 1.14.1-beta08
+Release:        0.alpha10npmwindows%{?dist}
+%global upstream_version 1.14.1-alpha10npmwindows
 Summary:        Bash Automated Testing System
 
 Group:          Development/Libraries
