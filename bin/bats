@@ -70,16 +70,14 @@ fi
 export BATS_SAVED_PATH=$PATH
 BATS_BASE_LIBDIR=lib # this will be patched with the true value in install.sh
 
-# npm's PowerShell shim starts Git Bash with Windows-form paths. Normalize the
-# working directory and any library path inherited from PowerShell before Bats
-# evaluates test code or splits BATS_LIB_PATH on colons.
-if [[ ${OSTYPE-} == cygwin || ${OSTYPE-} == msys ]]; then
-  cd -P .
+# npm's PowerShell shim can supply BATS_LIB_PATH in Windows form. Normalize it
+# before Bats evaluates test code or splits BATS_LIB_PATH on colons.
+if [[ ${OSTYPE-} == cygwin || ${OSTYPE-} == msys ]] &&
+  command -v cygpath >/dev/null 2>&1
+then
   if [[ -n ${BATS_LIB_PATH-} ]]; then
     BATS_LIB_PATH=$(cygpath --unix --path "$BATS_LIB_PATH")
-    MSYS2_ENV_CONV_EXCL="${MSYS2_ENV_CONV_EXCL:+${MSYS2_ENV_CONV_EXCL};}BATS_LIB_PATH"
     export BATS_LIB_PATH
-    export MSYS2_ENV_CONV_EXCL
   fi
 fi
 
