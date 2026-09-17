@@ -1,3 +1,4 @@
+# shellcheck disable=all
 @test "no extra whitespace" {
   :
 }
@@ -22,7 +23,7 @@
 	  :
 	}
 
-	 @test	 "extra whitespace around single-line test"	 {	 :;	 }	 
+	 @test	 "extra whitespace around single-line test"	 {	 :;	 }
 
 @test "no extra whitespace around single-line test" {:;}
 
