@@ -23,6 +23,10 @@ The format is based on [Keep a Changelog][kac] and this project adheres to
 * normalize BATS_ROOT from PowerShell on Windows (#1257)
 * normalize BATS_LIB_PATH from PowerShell on Windows (#1258)
 
+### Changed
+
+* claim parallel semaphore slots atomically (#1259)
+
 ### Documentation
 
 * removed the FAQ's outdated claim that suite-wide setup functionality does not exist; it now points to `setup_suite` (#1213)
