@@ -43,11 +43,8 @@ bats_semaphore_run() {
   local output_dir=$1
   shift
   local semaphore_slot
-  bats_parallel_diagnostic "slot requested output=$output_dir"
   semaphore_slot=$(bats_semaphore_acquire_slot)
-  bats_parallel_diagnostic "slot acquired slot=$semaphore_slot output=$output_dir"
   bats_semaphore_release_wrapper "$output_dir" "$semaphore_slot" "$@" &
-  bats_parallel_diagnostic "worker started worker=$! slot=$semaphore_slot output=$output_dir"
   printf "%d\n" "$!"
 }
 
