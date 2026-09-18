@@ -170,17 +170,19 @@ jobs:
 
   macos:
     strategy:
+      fail-fast: false
       matrix:
         os: ['macos-14', 'macos-15']
         env_vars:
           - 'BATS_PARALLEL_BINARY_NAME=rush'
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 350
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Install unbuffer via expect
-        run: brew install expect
+      - name: Install test tools
+        run: brew install expect coreutils
       - name: Install rush
         run: |
           curl -sSfL https://github.com/shenwei356/rush/releases/download/v0.5.0/rush_darwin_amd64.tar.gz | sudo tar xzf - -C /usr/local/bin
@@ -188,6 +190,7 @@ jobs:
 
       - name: Run test on OS ${{ matrix.os }}
         shell: 'unbuffer bash {0}' # work around tty issues
+        timeout-minutes: 320
         env:
           TERM: linux # fix tput for tty issue work around
         run: |
@@ -215,7 +218,31 @@ jobs:
             fi
           }
           trap stop_diagnostics EXIT
-          bash -c "time ${{ matrix.env_vars }} bin/bats --print-output-on-failure test/parallel.bats"
+
+          stress_deadline=$((SECONDS + 5 * 60 * 60))
+          iteration=0
+          successes=0
+          failures=0
+          timeouts=0
+          while ((SECONDS < stress_deadline)); do
+            ((++iteration))
+            printf '\n=== parallel stress iteration %d; elapsed %dm ===\n' "$iteration" "$((SECONDS / 60))"
+            if gtimeout --signal=TERM --kill-after=30s 10m \
+              env ${{ matrix.env_vars }} bin/bats --print-output-on-failure test/parallel.bats; then
+              ((++successes))
+            else
+              status=$?
+              ((++failures))
+              if [[ $status -eq 124 ]]; then
+                ((++timeouts))
+              fi
+              printf 'Parallel stress iteration %d failed with status %d; continuing\n' "$iteration" "$status" >&2
+              sleep 5
+            fi
+          done
+          printf '\nCompleted %d parallel stress iterations in %dm: %d succeeded, %d failed, %d timed out\n' \
+            "$iteration" "$((SECONDS / 60))" "$successes" "$failures" "$timeouts"
+          ((failures == 0))
 
       - name: Print parallel diagnostics
         if: ${{ always() && contains(matrix.env_vars, 'BATS_PARALLEL_BINARY_NAME=rush') && job.status != 'success' }}
