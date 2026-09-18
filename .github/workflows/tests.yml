@@ -201,6 +201,30 @@ jobs:
           TERM: linux # fix tput for tty issue work around
         run: |
           bash --version
+          diagnostic_pid=
+          if [[ '${{ matrix.env_vars }}' == *BATS_PARALLEL_BINARY_NAME=rush* ]]; then
+            diagnostic_dir="$RUNNER_TEMP/bats-parallel-diagnostics"
+            mkdir -p "$diagnostic_dir"
+            export BATS_PARALLEL_DIAGNOSTICS_FILE="$diagnostic_dir/events.log"
+            (
+              while true; do
+                {
+                  date '+%Y-%m-%dT%H:%M:%S%z process snapshot'
+                  ps -Ao pid=,ppid=,state=,etime=,command= | grep -E '[b]ats|[r]ush|[s]hlock|[g]rep -v|[s]leep'
+                  find "${TMPDIR:-/tmp}" -type f \( -name 'slot-*' -o -name 'shlock.lock' -o -name 'barrier-*' \) -print 2>/dev/null
+                } >>"$diagnostic_dir/processes.log"
+                sleep 5
+              done
+            ) &
+            diagnostic_pid=$!
+          fi
+          stop_diagnostics() {
+            if [[ -n "$diagnostic_pid" ]]; then
+              kill "$diagnostic_pid" 2>/dev/null || true
+              wait "$diagnostic_pid" 2>/dev/null || true
+            fi
+          }
+          trap stop_diagnostics EXIT
           bash -c "time ${{ matrix.env_vars }} bin/bats  --print-output-on-failure test"
 
       - name: Print parallel diagnostics
