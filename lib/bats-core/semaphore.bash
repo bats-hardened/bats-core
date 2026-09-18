@@ -1,16 +1,8 @@
 #!/usr/bin/env bash
 
-bats_parallel_diagnostic() {
-  [[ -n "${BATS_PARALLEL_DIAGNOSTICS_FILE:-}" ]] || return 0
-  printf '%s pid=%s ppid=%s semaphore %s\n' \
-    "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$$" "$PPID" "$*" >>"$BATS_PARALLEL_DIAGNOSTICS_FILE"
-}
-
 # setup the semaphore environment for the loading file
 bats_semaphore_setup() {
-  export -f bats_parallel_diagnostic
   export BATS_SEMAPHORE_DIR="$BATS_RUN_TMPDIR/semaphores"
-  bats_parallel_diagnostic "setup implementation=mkdir slots=$BATS_SEMAPHORE_NUMBER_OF_SLOTS dir=$BATS_SEMAPHORE_DIR"
 }
 
 # $1 - output directory for stdout/stderr
@@ -23,11 +15,8 @@ bats_semaphore_run() {
   local output_dir=$1
   shift
   local semaphore_slot
-  bats_parallel_diagnostic "slot requested output=$output_dir"
   semaphore_slot=$(bats_semaphore_acquire_slot)
-  bats_parallel_diagnostic "slot acquired slot=$semaphore_slot output=$output_dir"
   bats_semaphore_release_wrapper "$output_dir" "$semaphore_slot" "$@" &
-  bats_parallel_diagnostic "worker started worker=$! slot=$semaphore_slot output=$output_dir"
   printf "%d\n" "$!"
 }
 
@@ -73,5 +62,4 @@ bats_semaphore_release_slot() {
   # we don't need to lock this, since only our process owns this file
   # and freeing a semaphore cannot lead to conflicts with others
   rmdir "$BATS_SEMAPHORE_DIR/slot-$1" # this will fail if we had not acquired a semaphore!
-  bats_parallel_diagnostic "slot released slot=$1"
 }

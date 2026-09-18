@@ -205,7 +205,6 @@ jobs:
           if [[ '${{ matrix.env_vars }}' == *BATS_PARALLEL_BINARY_NAME=rush* ]]; then
             diagnostic_dir="$RUNNER_TEMP/bats-parallel-diagnostics"
             mkdir -p "$diagnostic_dir"
-            export BATS_PARALLEL_DIAGNOSTICS_FILE="$diagnostic_dir/events.log"
             (
               while true; do
                 {
@@ -231,8 +230,6 @@ jobs:
         if: ${{ always() && contains(matrix.env_vars, 'BATS_PARALLEL_BINARY_NAME=rush') && job.status != 'success' }}
         run: |
           diagnostic_dir="$RUNNER_TEMP/bats-parallel-diagnostics"
-          echo '=== semaphore and barrier events ==='
-          cat "$diagnostic_dir/events.log" 2>/dev/null || true
           echo '=== process snapshots ==='
           cat "$diagnostic_dir/processes.log" 2>/dev/null || true
 

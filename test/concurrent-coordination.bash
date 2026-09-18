@@ -1,12 +1,6 @@
 # block until at least <barrier-size> processes of this barrier group entered the barrier
 # once this happened, all latecomers will go through immediately!
 # WARNING: a barrier group consists of all processes with the same barrier name *and* size!
-parallel_test_diagnostic() {
-  [[ -n "${BATS_PARALLEL_DIAGNOSTICS_FILE:-}" ]] || return 0
-  printf '%s pid=%s ppid=%s barrier %s\n' \
-    "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$$" "$PPID" "$*" >>"$BATS_PARALLEL_DIAGNOSTICS_FILE"
-}
-
 single-use-barrier() { # <barrier-name> <barrier-size> [<timeout-in-seconds> [<sleep-cycle-time>]]
   local barrier_name="$1"
   local barrier_size="$2"
@@ -18,15 +12,12 @@ single-use-barrier() { # <barrier-name> <barrier-size> [<timeout-in-seconds> [<s
   local BARRIER_FILE="$BATS_SUITE_TMPDIR/barrier-$BARRIER_SUFFIX"
   # mark our entry for all others
   # concurrent writes may interleave but should not lose their newlines
-  parallel_test_diagnostic "entering name=$BARRIER_SUFFIX file=$BARRIER_FILE"
   echo "in-$$" >>"$BARRIER_FILE"
-  parallel_test_diagnostic "entered name=$BARRIER_SUFFIX count=$(wc -l <"$BARRIER_FILE") file=$BARRIER_FILE"
   local start="$SECONDS"
   # wait for others to enter
   while [[ $(wc -l <"$BARRIER_FILE") -lt $barrier_size ]]; do
     if [[ $timeout_in_seconds -ne 0 && $((SECONDS - start)) -gt $timeout_in_seconds ]]; then
       mv "$BARRIER_FILE" "$BARRIER_FILE-timeout"
-      parallel_test_diagnostic "timed-out name=$BARRIER_SUFFIX file=$BARRIER_FILE-timeout"
       printf "ERROR: single-use-barrier %s timed out\n" "$BARRIER_SUFFIX" >&2
       return 1
     fi
@@ -34,7 +25,6 @@ single-use-barrier() { # <barrier-name> <barrier-size> [<timeout-in-seconds> [<s
   done
   # mark our exit
   echo "out-$$" >>"$BARRIER_FILE"
-  parallel_test_diagnostic "leaving name=$BARRIER_SUFFIX count=$(wc -l <"$BARRIER_FILE") file=$BARRIER_FILE"
 }
 
 # block until at least <latch-size> signalling threads have passed the latch
