@@ -1,30 +1,19 @@
 #!/usr/bin/env bash
 
-bats_parallel_diagnostic() {
-  [[ -n "${BATS_PARALLEL_DIAGNOSTICS_FILE:-}" ]] || return 0
-  printf '%s pid=%s ppid=%s semaphore %s\n' \
-    "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$$" "$PPID" "$*" >>"$BATS_PARALLEL_DIAGNOSTICS_FILE"
-}
-
 bats_run_under_flock() {
-  bats_parallel_diagnostic "flock waiting dir=$BATS_SEMAPHORE_DIR"
   flock "$BATS_SEMAPHORE_DIR" "$@"
 }
 
 bats_run_under_shlock() {
   local lockfile="$BATS_SEMAPHORE_DIR/shlock.lock"
-  bats_parallel_diagnostic "shlock waiting lock=$lockfile"
   while ! shlock -p $$ -f "$lockfile"; do
-    bats_parallel_diagnostic "shlock contended lock=$lockfile"
     sleep 1
   done
-  bats_parallel_diagnostic "shlock acquired lock=$lockfile"
   # we got the lock now, execute the command
   "$@"
   local status=$?
   # free the lock
   rm -f "$lockfile"
-  bats_parallel_diagnostic "shlock released lock=$lockfile status=$status"
   return $status
 }
 
@@ -32,7 +21,6 @@ bats_run_under_shlock() {
 bats_semaphore_setup() {
   export -f bats_semaphore_get_free_slot_count
   export -f bats_semaphore_acquire_while_locked
-  export -f bats_parallel_diagnostic
   export BATS_SEMAPHORE_DIR="$BATS_RUN_TMPDIR/semaphores"
 
   if command -v flock >/dev/null; then
@@ -43,7 +31,6 @@ bats_semaphore_setup() {
     printf "ERROR: flock/shlock is required for parallelization within files!\n" >&2
     exit 1
   fi
-  bats_parallel_diagnostic "setup implementation=$BATS_LOCKING_IMPLEMENTATION slots=$BATS_SEMAPHORE_NUMBER_OF_SLOTS dir=$BATS_SEMAPHORE_DIR"
 }
 
 # $1 - output directory for stdout/stderr
@@ -119,7 +106,6 @@ bats_semaphore_release_slot() {
   # we don't need to lock this, since only our process owns this file
   # and freeing a semaphore cannot lead to conflicts with others
   rm "$BATS_SEMAPHORE_DIR/slot-$1" # this will fail if we had not acquired a semaphore!
-  bats_parallel_diagnostic "slot released slot=$1"
 }
 
 bats_semaphore_get_free_slot_count() {

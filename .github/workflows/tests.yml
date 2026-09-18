@@ -210,8 +210,8 @@ jobs:
               while true; do
                 {
                   date '+%Y-%m-%dT%H:%M:%S%z process snapshot'
-                  ps -Ao pid=,ppid=,state=,etime=,command= | grep -E '[b]ats|[r]ush|[s]hlock|[g]rep -v|[s]leep'
-                  find "${TMPDIR:-/tmp}" -type f \( -name 'slot-*' -o -name 'shlock.lock' -o -name 'barrier-*' \) -print 2>/dev/null
+                  ps -Ao pid=,ppid=,state=,etime=,command= | grep -E '[b]ats|[r]ush|[g]rep -v|[s]leep'
+                  find "${TMPDIR:-/tmp}" \( -type d -name 'slot-*' -o -type f -name 'barrier-*' \) -print 2>/dev/null
                 } >>"$diagnostic_dir/processes.log"
                 sleep 5
               done
