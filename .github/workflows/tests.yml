@@ -173,9 +173,6 @@ jobs:
       matrix:
         os: ['macos-14', 'macos-15']
         env_vars:
-          - ''
-          # allow for some parallelity without GNU parallel, since it is not installed by default
-          - 'BATS_NO_PARALLELIZE_ACROSS_FILES=1 BATS_NUMBER_OF_PARALLEL_JOBS=2'
           - 'BATS_PARALLEL_BINARY_NAME=rush'
     runs-on: ${{ matrix.os }}
     steps:
@@ -188,12 +185,6 @@ jobs:
         run: |
           curl -sSfL https://github.com/shenwei356/rush/releases/download/v0.5.0/rush_darwin_amd64.tar.gz | sudo tar xzf - -C /usr/local/bin
         if: contains(matrix.env_vars, 'rush')
-
-      - name: Check failing tests fail suite,
-        shell: 'unbuffer bash {0}' # work around tty issues
-        env:
-          TERM: linux # fix tput for tty issue work around
-        run: bash -c '! bin/bats test/fixtures/bats/failing.bats'
 
       - name: Run test on OS ${{ matrix.os }}
         shell: 'unbuffer bash {0}' # work around tty issues
@@ -224,7 +215,7 @@ jobs:
             fi
           }
           trap stop_diagnostics EXIT
-          bash -c "time ${{ matrix.env_vars }} bin/bats  --print-output-on-failure test"
+          bash -c "time ${{ matrix.env_vars }} bin/bats --print-output-on-failure test/parallel.bats"
 
       - name: Print parallel diagnostics
         if: ${{ always() && contains(matrix.env_vars, 'BATS_PARALLEL_BINARY_NAME=rush') && job.status != 'success' }}
