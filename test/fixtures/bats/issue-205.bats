@@ -31,9 +31,9 @@ function get_open_fds() {
     IFS=$'\n' read -d '' -ra fds <"$tmpfile" || true
     for fd in "${fds[@]}"; do
       case $fd in
-      f[0-9]*)                # filter non fd entries (mainly pid?)
-        open_fds+=("${fd#f}") # cut off f prefix
-        ;;
+        f[0-9]*)                # filter non fd entries (mainly pid?)
+          open_fds+=("${fd#f}") # cut off f prefix
+          ;;
       esac
     done
   elif command -v procstat >/dev/null; then # BSDs
