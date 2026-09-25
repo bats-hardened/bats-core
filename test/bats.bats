@@ -549,13 +549,31 @@ END_OF_ERR_MSG
   reentrant_run bats "$FIXTURE_ROOT/external_function_calls.bats"
   [ "$status" -eq 1 ]
 
+  # Collect the source line of the failing statement in each fixture test.
+  # Every fixture test deliberately fails on its final non-comment statement.
+  expectedErrorLines=()
+  while IFS= read -r line; do
+    expectedErrorLines+=("$line")
+  done < <(
+    awk '
+      # A test body starts on a line beginning with "@test".
+      /^@test / { in_test = 1; next }
+      # At the closing brace, output the last statement line remembered below.
+      in_test && /^}/ { print last_statement; in_test = 0; next }
+      # Within the test, remember each non-empty, non-comment source line.
+      # The last one encountered is the statement that deliberately fails.
+      in_test && $0 !~ /^[[:space:]]*(#|$)/ { last_statement = NR }
+    ' "$FIXTURE_ROOT/external_function_calls.bats"
+  )
+
   expectedNumberOfTests=12
-  linesPerTest=6
+  # Fail early unless every test has an error line.
+  [ "${#expectedErrorLines[@]}" -eq "$expectedNumberOfTests" ]
 
   outputOffset=1
-  currentErrorLine=10
 
   for t in $(seq $expectedNumberOfTests); do
+    currentErrorLine="${expectedErrorLines[$((t - 1))]}"
     echo "t=$t outputOffset=$outputOffset currentErrorLine=$currentErrorLine"
     # shellcheck disable=SC2076
     [[ "${lines[$outputOffset]}" =~ "not ok $t " ]]
@@ -577,7 +595,6 @@ END_OF_ERR_MSG
       return 1
       ;;
     esac
-    currentErrorLine=$((currentErrorLine + linesPerTest))
   done
 }
 

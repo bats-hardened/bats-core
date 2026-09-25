@@ -2,17 +2,15 @@ load test_helper
 
 # Test various combinations that may fail line number detection in stack trace
 # Tests are designed so the first statement succeeds and 2nd fails
-# All tests fail on the same line so checking can be automated
+# The final non-comment statement in each test fails so its line can be derived
 
 @test "Call true function && false stackdepth=1" {
   help_me
-  # padding: keeps the failing statement on the 6-line grid (see test/bats.bats)
   help_me && false
 }
 
 @test "Call true function && return 1 stackdepth=1" {
   help_me
-  # padding: keeps the failing statement on the 6-line grid (see test/bats.bats)
   help_me && return 1
 }
 
@@ -42,13 +40,11 @@ load test_helper
 
 @test "Call return_0 function && false stackdepth=1" {
   return_0
-  # padding: keeps the failing statement on the 6-line grid (see test/bats.bats)
   return_0 && false
 }
 
 @test "Call return_0 function && return 1 stackdepth=1" {
   return_0
-  # padding: keeps the failing statement on the 6-line grid (see test/bats.bats)
   return_0 && return 1
 }
 
