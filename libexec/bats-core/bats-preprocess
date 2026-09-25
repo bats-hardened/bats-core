@@ -102,12 +102,12 @@ IFS=,
       if [[ "$line" =~ $BATS_COMMENT_COMMAND_PATTERN ]]; then
         command=${BASH_REMATCH[1]}
         case $command in
-          'test_tags='*)
-            extract_tags test_tags "${command#test_tags=}"
-            ;;
-          'file_tags='*)
-            extract_tags file_tags "${command#file_tags=}"
-            ;;
+        'test_tags='*)
+          extract_tags test_tags "${command#test_tags=}"
+          ;;
+        'file_tags='*)
+          extract_tags file_tags "${command#file_tags=}"
+          ;;
         esac
       fi
       printf '%s\n' "$line"

@@ -10,16 +10,16 @@ BATS_PRETTY_FORMAT_INTERACTIVE=
 
 while [[ "$#" -ne 0 ]]; do
   case "$1" in
-    -T)
-      BATS_ENABLE_TIMING="-T"
-      ;;
-    --base-path)
-      shift
-      normalize_base_path BASE_PATH "$1"
-      ;;
-    --interactive)
-      BATS_PRETTY_FORMAT_INTERACTIVE=1
-      ;;
+  -T)
+    BATS_ENABLE_TIMING="-T"
+    ;;
+  --base-path)
+    shift
+    normalize_base_path BASE_PATH "$1"
+    ;;
+  --interactive)
+    BATS_PRETTY_FORMAT_INTERACTIVE=1
+    ;;
   esac
   shift
 done
@@ -129,15 +129,15 @@ timeout() {
 
 log() {
   case ${test_result} in
-    pass)
-      clear_color
-      ;;
-    fail)
-      set_color 1
-      ;;
-    timeout)
-      set_color 3
-      ;;
+  pass)
+    clear_color
+    ;;
+  fail)
+    set_color 1
+    ;;
+  timeout)
+    set_color 3
+    ;;
   esac
   buffer '   %s\n' "$1"
   clear_color

@@ -9,6 +9,7 @@ load test_helper
   help_me && false
 }
 
+
 @test "Call true function && return 1 stackdepth=1" {
   help_me
   help_me && return 1
@@ -38,10 +39,12 @@ load test_helper
   failing_helper
 }
 
+
 @test "Call return_0 function && false stackdepth=1" {
   return_0
   return_0 && false
 }
+
 
 @test "Call return_0 function && return 1 stackdepth=1" {
   return_0
