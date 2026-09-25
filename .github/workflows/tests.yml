@@ -40,7 +40,7 @@ jobs:
         with:
           persist-credentials: false
       - run: |
-          curl -sSfL https://github.com/mvdan/sh/releases/download/v3.5.1/shfmt_v3.5.1_linux_amd64 -o shfmt
+          curl -sSfL https://github.com/mvdan/sh/releases/download/v3.14.1/shfmt_v3.14.1_linux_amd64 -o shfmt
           chmod a+x shfmt
       - run: ./shfmt --diff .
 
@@ -51,7 +51,7 @@ jobs:
       - name: Install shfmt
         shell: bash
         run: |
-          go install mvdan.cc/sh/v3/cmd/shfmt@v3.5.1
+          go install mvdan.cc/sh/v3/cmd/shfmt@v3.14.1
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
       - run: shfmt --indent 2 -case-indent --diff .
 
