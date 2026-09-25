@@ -742,7 +742,11 @@ END_OF_ERR_MSG
   bats "$FIXTURE_ROOT/hang_in_test.bats" & # don't block execution, or we cannot send signals
   SUBPROCESS_PID=$!
 
-  single-use-latch::wait hang_in_test 1
+  if ! single-use-latch::wait hang_in_test 1 10; then
+    kill -9 -- -$SUBPROCESS_PID 2>/dev/null || true
+    wait "$SUBPROCESS_PID" 2>/dev/null || true
+    false
+  fi
 
   # emulate CTRL-C by sending SIGINT to the whole process group
   kill -SIGINT -- -$SUBPROCESS_PID
