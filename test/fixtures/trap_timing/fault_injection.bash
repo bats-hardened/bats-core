@@ -17,30 +17,30 @@ _bats_inject_fault() {
   trap - DEBUG
 
   case ${BATS_FAULT_CAPTURE:-} in
-  RUNNING_JOB)
-    printf '%s\n' "$running_job" >"$BATS_FAULT_CAPTURE_FILE"
-    ;;
-  TMPDIR)
-    printf '%s\n' "$TMPDIR" >"$BATS_FAULT_CAPTURE_FILE"
-    ;;
+    RUNNING_JOB)
+      printf '%s\n' "$running_job" >"$BATS_FAULT_CAPTURE_FILE"
+      ;;
+    TMPDIR)
+      printf '%s\n' "$TMPDIR" >"$BATS_FAULT_CAPTURE_FILE"
+      ;;
   esac
 
   case ${BATS_FAULT_ACTION:-exit} in
-  exit)
-    exit "${BATS_FAULT_STATUS:-23}"
-    ;;
-  TERM-current-shell)
-    # $BASHPID is the shell currently being debugged. A command substitution
-    # forks a subshell that is already reaped before `kill` can use its PID.
-    kill -TERM "$BASHPID"
-    ;;
+    exit)
+      exit "${BATS_FAULT_STATUS:-23}"
+      ;;
+
+    TERM-current-shell)
+      # $BASHPID is the shell currently being debugged. A command substitution
+      # forks a subshell that is already reaped before `kill` can use its PID.
+      kill -TERM "$BASHPID";;
   TERM)
     kill -TERM "$$"
-    ;;
-  TERM-then-mark)
-    kill -TERM "$$"
-    : >"$BATS_FAULT_CONTINUED_FILE"
-    ;;
+      ;;
+    TERM-then-mark)
+      kill -TERM "$$"
+      : >"$BATS_FAULT_CONTINUED_FILE"
+      ;;
   esac
 }
 

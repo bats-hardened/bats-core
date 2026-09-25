@@ -663,19 +663,19 @@ END_OF_ERR_MSG
     [[ "${lines[$outputOffset]}" =~ stackdepth=([0-9]+) ]]
     stackdepth="${BASH_REMATCH[1]}"
     case "${stackdepth}" in
-    1)
-      [ "${lines[$((outputOffset + 1))]}" = "# (in test file $RELATIVE_FIXTURE_ROOT/external_function_calls.bats, line $currentErrorLine)" ]
-      outputOffset=$((outputOffset + 3))
-      ;;
-    2)
-      [[ "${lines[$((outputOffset + 1))]}" =~ ^'# (from function `'.*\'' in file '.*'/test_helper.bash, line '[0-9]+,$ ]]
-      [ "${lines[$((outputOffset + 2))]}" = "#  in test file $RELATIVE_FIXTURE_ROOT/external_function_calls.bats, line $currentErrorLine)" ]
-      outputOffset=$((outputOffset + 4))
-      ;;
-    *)
-      printf 'error: stackdepth=%s not implemented\n' "${stackdepth}" >&2
-      return 1
-      ;;
+      1)
+        [ "${lines[$((outputOffset + 1))]}" = "# (in test file $RELATIVE_FIXTURE_ROOT/external_function_calls.bats, line $currentErrorLine)" ]
+        outputOffset=$((outputOffset + 3))
+        ;;
+      2)
+        [[ "${lines[$((outputOffset + 1))]}" =~ ^'# (from function `'.*\'' in file '.*'/test_helper.bash, line '[0-9]+,$ ]]
+        [ "${lines[$((outputOffset + 2))]}" = "#  in test file $RELATIVE_FIXTURE_ROOT/external_function_calls.bats, line $currentErrorLine)" ]
+        outputOffset=$((outputOffset + 4))
+        ;;
+      *)
+        printf 'error: stackdepth=%s not implemented\n' "${stackdepth}" >&2
+        return 1
+        ;;
     esac
     currentErrorLine=$((currentErrorLine + linesPerTest))
   done
@@ -1653,9 +1653,9 @@ END_OF_ERR_MSG
     [ "${lines[1]}" == 'ok 1 long one' ]
     [ "${lines[2]}" == 'ok 2 short one' ]
     case "$registration_case" in
-    multi-word) expected_log=$'2 <--format> <plain text>\n1 <--format>' ;;
-    glob) expected_log=$'2 <*> <extra>\n1 <*>' ;;
-    empty) expected_log=$'1 <>\n0' ;;
+      multi-word) expected_log=$'2 <--format> <plain text>\n1 <--format>' ;;
+      glob) expected_log=$'2 <*> <extra>\n1 <*>' ;;
+      empty) expected_log=$'1 <>\n0' ;;
     esac
     [ "$(<"$log")" == "$expected_log" ]
   done

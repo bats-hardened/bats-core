@@ -10,10 +10,10 @@ DESTDIR="${BATS_LIBS_DEST_DIR:-/usr/lib/bats}"
 BATS_LIBS_TMPDIR=
 
 cleanup() {
-    local status=${1:-$?}
-    trap - ERR EXIT INT TERM
-    test -z "${BATS_LIBS_TMPDIR}" || test ! -d "${BATS_LIBS_TMPDIR}" || rm -rf "${BATS_LIBS_TMPDIR}"
-    exit "$status"
+  local status=${1:-$?}
+  trap - ERR EXIT INT TERM
+  test -z "${BATS_LIBS_TMPDIR}" || test ! -d "${BATS_LIBS_TMPDIR}" || rm -rf "${BATS_LIBS_TMPDIR}"
+  exit "$status"
 }
 
 trap 'cleanup $?' ERR EXIT
