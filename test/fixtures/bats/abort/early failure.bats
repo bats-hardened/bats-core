@@ -1,9 +1,9 @@
 : "${MARKER_FILE?}" # ensure the parameter is set!
 
 @test failing {
-    false
+  false
 }
 
 @test waiting {
-    sleep 1
+  sleep 1
 }
