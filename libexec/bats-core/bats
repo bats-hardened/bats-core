@@ -116,10 +116,14 @@ expand_path() {
   printf -v "$result" '%s/%s' "$dirname" "${path##*/}"
 }
 
-BATS_LIBEXEC="$(
-  cd "$(dirname "$(bats_readlinkf "${BASH_SOURCE[0]}")")"
-  pwd
-)"
+if declare -F bats_readlinkf >/dev/null; then
+  BATS_LIBEXEC="$(
+    cd "$(dirname "$(bats_readlinkf "${BASH_SOURCE[0]}")")"
+    pwd
+  )"
+elif [[ ! -x "${BATS_LIBEXEC:-}/bats-exec-suite" ]]; then
+  abort --no-print-usage "Could not determine Bats libexec directory"
+fi
 export BATS_LIBEXEC
 export BATS_CWD="$PWD"
 export PATH="$BATS_LIBEXEC:$PATH"
