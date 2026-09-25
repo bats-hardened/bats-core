@@ -44,6 +44,17 @@ jobs:
           chmod a+x shfmt
       - run: ./shfmt --diff .
 
+  shfmt-go-install:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install shfmt
+        shell: bash
+        run: |
+          go install mvdan.cc/sh/v3/cmd/shfmt@v3.5.1
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+      - run: shfmt --indent 2 -case-indent --diff .
+
   # Ensure we detect when a change disables Bats from reporting failure.
   # This would not be detectable by Bats' selftests.
   failsafe:
