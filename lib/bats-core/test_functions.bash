@@ -207,28 +207,28 @@ bats_pipe() { # [-N] [--] command0 [ \| command1 [ \| command2 [...]]]
   # parse options starting with -
   while [[ $# -gt 0 ]] && [[ $1 == -* ]]; do
     case "$1" in
-    -[0-9]*)
-      pipestatus_position="${1#-}"
-      ;;
-    --returned-status*)
-      if [ "$1" = "--returned-status" ]; then
-        pipestatus_position="$2"
-        shift
-      elif [[ "$1" =~ ^--returned-status= ]]; then
-        pipestatus_position="${1#--returned-status=}"
-      else
+      -[0-9]*)
+        pipestatus_position="${1#-}"
+        ;;
+      --returned-status*)
+        if [ "$1" = "--returned-status" ]; then
+          pipestatus_position="$2"
+          shift
+        elif [[ "$1" =~ ^--returned-status= ]]; then
+          pipestatus_position="${1#--returned-status=}"
+        else
+          printf "Usage error: unknown flag '%s'" "$1" >&2
+          return 1
+        fi
+        ;;
+      --)
+        shift # eat the -- before breaking away
+        break
+        ;;
+      *)
         printf "Usage error: unknown flag '%s'" "$1" >&2
         return 1
-      fi
-      ;;
-    --)
-      shift # eat the -- before breaking away
-      break
-      ;;
-    *)
-      printf "Usage error: unknown flag '%s'" "$1" >&2
-      return 1
-      ;;
+        ;;
     esac
     shift
   done
@@ -320,33 +320,33 @@ run() { # [!|-N] [--keep-empty-lines] [--separate-stderr] [--] <command to run..
   while [[ $# -gt 0 ]] && [[ $1 == -* || $1 == '!' ]]; do
     has_flags=1
     case "$1" in
-    '!')
-      expected_rc=-1
-      ;;
-    -[0-9]*)
-      expected_rc=${1#-}
-      if [[ $expected_rc =~ [^0-9] ]]; then
-        printf "Usage error: run: '-NNN' requires numeric NNN (got: %s)\n" "$expected_rc" >&2
+      '!')
+        expected_rc=-1
+        ;;
+      -[0-9]*)
+        expected_rc=${1#-}
+        if [[ $expected_rc =~ [^0-9] ]]; then
+          printf "Usage error: run: '-NNN' requires numeric NNN (got: %s)\n" "$expected_rc" >&2
+          return 1
+        elif [[ $expected_rc -gt 255 ]]; then
+          printf "Usage error: run: '-NNN': NNN must be <= 255 (got: %d)\n" "$expected_rc" >&2
+          return 1
+        fi
+        ;;
+      --keep-empty-lines)
+        keep_empty_lines=1
+        ;;
+      --separate-stderr)
+        output_case="separate"
+        ;;
+      --)
+        shift # eat the -- before breaking away
+        break
+        ;;
+      *)
+        printf "Usage error: unknown flag '%s'" "$1" >&2
         return 1
-      elif [[ $expected_rc -gt 255 ]]; then
-        printf "Usage error: run: '-NNN': NNN must be <= 255 (got: %d)\n" "$expected_rc" >&2
-        return 1
-      fi
-      ;;
-    --keep-empty-lines)
-      keep_empty_lines=1
-      ;;
-    --separate-stderr)
-      output_case="separate"
-      ;;
-    --)
-      shift # eat the -- before breaking away
-      break
-      ;;
-    *)
-      printf "Usage error: unknown flag '%s'" "$1" >&2
-      return 1
-      ;;
+        ;;
     esac
     shift
   done
@@ -368,14 +368,14 @@ run() { # [!|-N] [--keep-empty-lines] [--separate-stderr] [--] <command to run..
   local tmpdir=${BATS_TEST_TMPDIR:-${BATS_FILE_TMPDIR:-${BATS_RUN_TMPDIR}}}
 
   case "$output_case" in
-  merged) # redirects stderr into stdout and fills only $output/$lines
-    pre_command=(bats_merge_stdout_and_stderr)
-    ;;
-  separate) # splits stderr into own file and fills $stderr/$stderr_lines too
-    local bats_run_separate_stderr_file
-    bats_run_separate_stderr_file="$(mktemp "${tmpdir}/separate-stderr-XXXXXX")"
-    pre_command=(bats_redirect_stderr_into_file)
-    ;;
+    merged) # redirects stderr into stdout and fills only $output/$lines
+      pre_command=(bats_merge_stdout_and_stderr)
+      ;;
+    separate) # splits stderr into own file and fills $stderr/$stderr_lines too
+      local bats_run_separate_stderr_file
+      bats_run_separate_stderr_file="$(mktemp "${tmpdir}/separate-stderr-XXXXXX")"
+      pre_command=(bats_redirect_stderr_into_file)
+      ;;
   esac
 
   if [[ -n "${BATS_RUN_ERREXIT:-}" ]]; then
@@ -491,27 +491,27 @@ bats_test_function() {
   local tags=() current_tags=()
   while (($# > 0)); do
     case "$1" in
-    --description)
-      local test_description=
-      # use eval to resolve variable references in test names
-      eval "printf -v test_description '%s' \"$2\""
-      shift 2
-      ;;
-    --tags)
-      if [[ "$2" != "" ]]; then # avoid unbound variable with set -u Bash 3
-        IFS=',' read -ra current_tags <<<"$2"
-        tags+=("${current_tags[@]}")
-      fi
-      shift 2
-      ;;
-    --)
-      shift
-      break
-      ;;
-    *)
-      printf "ERROR: unknown option %s for bats_test_function" "$1" >&2
-      exit 1
-      ;;
+      --description)
+        local test_description=
+        # use eval to resolve variable references in test names
+        eval "printf -v test_description '%s' \"$2\""
+        shift 2
+        ;;
+      --tags)
+        if [[ "$2" != "" ]]; then # avoid unbound variable with set -u Bash 3
+          IFS=',' read -ra current_tags <<<"$2"
+          tags+=("${current_tags[@]}")
+        fi
+        shift 2
+        ;;
+      --)
+        shift
+        break
+        ;;
+      *)
+        printf "ERROR: unknown option %s for bats_test_function" "$1" >&2
+        exit 1
+        ;;
     esac
   done
 
