@@ -22,14 +22,14 @@ check_parallel_tests() { # <expected maximum parallelity>
   while IFS= read -r line; do
     ((++read_lines))
     case "$line" in
-    "start "*)
-      if ((++started_tests > max_parallel_tests)); then
-        max_parallel_tests="$started_tests"
-      fi
-      ;;
-    "stop "*)
-      ((started_tests--))
-      ;;
+      "start "*)
+        if ((++started_tests > max_parallel_tests)); then
+          max_parallel_tests="$started_tests"
+        fi
+        ;;
+      "stop "*)
+        ((started_tests--))
+        ;;
     esac
   done <"$FILE_MARKER"
 
@@ -140,13 +140,13 @@ check_parallel_tests() { # <expected maximum parallelity>
   local current_parallel_count=0 maximum_parallel_count=0 total_count=0
   while read -r line; do
     case "$line" in
-    setup*)
-      ((++current_parallel_count))
-      ((++total_count))
-      ;;
-    teardown*)
-      ((current_parallel_count--))
-      ;;
+      setup*)
+        ((++current_parallel_count))
+        ((++total_count))
+        ;;
+      teardown*)
+        ((current_parallel_count--))
+        ;;
     esac
     if ((current_parallel_count > maximum_parallel_count)); then
       maximum_parallel_count=$current_parallel_count
@@ -216,6 +216,6 @@ check_parallel_tests() { # <expected maximum parallelity>
 @test "Negative jobs number does not run endlessly" {
   unset BATS_NO_PARALLELIZE_ACROSS_FILES
   run bats -j -3 "$FIXTURE_ROOT/../bats/passing.bats"
-  (( SECONDS < 5 ))
+  ((SECONDS < 5))
   [ "${lines[1]}" = 'Invalid number of jobs: -3' ]
 }

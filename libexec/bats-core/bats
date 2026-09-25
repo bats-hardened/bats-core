@@ -181,155 +181,155 @@ while [[ "$#" -ne 0 ]]; do
   fi
 
   case "$1" in
-  --)
-    shift
-    arguments+=("$@")
-    break
-    ;;
-  -h | --help)
-    version
-    usage
-    exit 0
-    ;;
-  -v | --version)
-    version
-    exit 0
-    ;;
-  -c | --count)
-    flags+=('-c')
-    ;;
-  --allow-empty-suite)
-    flags+=(--allow-empty-suite)
-    ;;
-  -f | --filter)
-    shift
-    flags+=('-f' "$1")
-    ;;
-  --negative-filter)
-    shift
-    flags+=('--negative-filter' "$1")
-    ;;
-  -F | --formatter)
-    shift
-    # allow cat formatter to see extended output but don't advertise to users
-    if [[ $1 =~ ^(pretty|junit|tap|tap13|cat|/.*)$ ]]; then
-      formatter="$1"
-    else
-      printf "Unknown formatter '%s', valid options are %s\n" "$1" "${VALID_FORMATTERS}"
-      exit 1
-    fi
-    ;;
-  --report-formatter)
-    shift
-    if [[ $1 =~ ^(cat|pretty|junit|tap|tap13|/.*)$ ]]; then
-      report_formatter="$1"
-    else
-      printf "Unknown report formatter '%s', valid options are %s\n" "$1" "${VALID_FORMATTERS}"
-      exit 1
-    fi
-    ;;
-  -o | --output)
-    shift
-    BATS_REPORT_OUTPUT_DIR="$1"
-    ;;
-  -p | --pretty)
-    formatter='pretty'
-    ;;
-  -j | --jobs)
-    shift
-    flags+=('-j' "$1")
-    ;;
-  --parallel-binary-name)
-    shift
-    flags+=('--parallel-binary-name' "$1")
-    ;;
-  -r | --recursive)
-    recursive=1
-    ;;
-  -t | --tap)
-    formatter='tap'
-    ;;
-  -T | --timing)
-    flags+=('-T')
-    formatter_flags+=('-T')
-    ;;
-  --abort)
-    flags+=('--abort')
-    ;;
-  # this flag is now a no-op, as it is the parallel default
-  --parallel-preserve-environment) ;;
-
-  --no-parallelize-across-files)
-    flags+=("--no-parallelize-across-files")
-    ;;
-  --no-parallelize-within-files)
-    flags+=("--no-parallelize-within-files")
-    ;;
-  --no-tempdir-cleanup)
-    BATS_TEMPDIR_CLEANUP=''
-    ;;
-  --errexit)
-    BATS_RUN_ERREXIT=1
-    ;;
-  --tempdir) # for internal test consumption only!
-    BATS_RUN_TMPDIR="$2"
-    shift
-    ;;
-  -x | --trace)
-    flags+=(--trace)
-    ;;
-  --print-output-on-failure)
-    flags+=(--print-output-on-failure)
-    ;;
-  --show-output-of-passing-tests)
-    flags+=(--show-output-of-passing-tests)
-    ;;
-  --verbose-run)
-    flags+=(--verbose-run)
-    ;;
-  --gather-test-outputs-in)
-    shift
-    output_dir="$1"
-    # Convert relative path to absolute to handle tests that change directory
-    # This ensures the path remains valid even if tests use 'cd'
-    if [[ $output_dir != /* ]]; then
-        output_dir="$PWD/$output_dir"
-    fi
-    if [ -d "$output_dir" ]; then
-      if ! find "$output_dir" -mindepth 1 -exec false {} + 2>/dev/null; then
-        abort --no-print-usage "Directory '$output_dir' must be empty for --gather-test-outputs-in"
+    --)
+      shift
+      arguments+=("$@")
+      break
+      ;;
+    -h | --help)
+      version
+      usage
+      exit 0
+      ;;
+    -v | --version)
+      version
+      exit 0
+      ;;
+    -c | --count)
+      flags+=('-c')
+      ;;
+    --allow-empty-suite)
+      flags+=(--allow-empty-suite)
+      ;;
+    -f | --filter)
+      shift
+      flags+=('-f' "$1")
+      ;;
+    --negative-filter)
+      shift
+      flags+=('--negative-filter' "$1")
+      ;;
+    -F | --formatter)
+      shift
+      # allow cat formatter to see extended output but don't advertise to users
+      if [[ $1 =~ ^(pretty|junit|tap|tap13|cat|/.*)$ ]]; then
+        formatter="$1"
+      else
+        printf "Unknown formatter '%s', valid options are %s\n" "$1" "${VALID_FORMATTERS}"
+        exit 1
       fi
-    elif ! mkdir "$output_dir" 2>/dev/null; then
-      abort --no-print-usage "Could not create '$output_dir' for --gather-test-outputs-in"
-    fi
-    flags+=(--gather-test-outputs-in "$output_dir")
-    ;;
-  --setup-suite-file)
-    shift
-    setup_suite_file="$1"
-    ;;
-  --code-quote-style)
-    shift
-    BATS_CODE_QUOTE_STYLE="$1"
-    ;;
-  --filter-status)
-    shift
-    flags+=('--filter-status' "$1")
-    ;;
-  --filter-tags)
-    shift
-    flags+=('--filter-tags' "$1")
-    ;;
-  --line-reference-format)
-    shift
-    BATS_LINE_REFERENCE_FORMAT=$1
-    ;;
-  -*)
-    abort "Bad command line option '$1'"
-    ;;
-  *)
-    arguments+=("$1")
-    ;;
+      ;;
+    --report-formatter)
+      shift
+      if [[ $1 =~ ^(cat|pretty|junit|tap|tap13|/.*)$ ]]; then
+        report_formatter="$1"
+      else
+        printf "Unknown report formatter '%s', valid options are %s\n" "$1" "${VALID_FORMATTERS}"
+        exit 1
+      fi
+      ;;
+    -o | --output)
+      shift
+      BATS_REPORT_OUTPUT_DIR="$1"
+      ;;
+    -p | --pretty)
+      formatter='pretty'
+      ;;
+    -j | --jobs)
+      shift
+      flags+=('-j' "$1")
+      ;;
+    --parallel-binary-name)
+      shift
+      flags+=('--parallel-binary-name' "$1")
+      ;;
+    -r | --recursive)
+      recursive=1
+      ;;
+    -t | --tap)
+      formatter='tap'
+      ;;
+    -T | --timing)
+      flags+=('-T')
+      formatter_flags+=('-T')
+      ;;
+    --abort)
+      flags+=('--abort')
+      ;;
+    # this flag is now a no-op, as it is the parallel default
+    --parallel-preserve-environment) ;;
+
+    --no-parallelize-across-files)
+      flags+=("--no-parallelize-across-files")
+      ;;
+    --no-parallelize-within-files)
+      flags+=("--no-parallelize-within-files")
+      ;;
+    --no-tempdir-cleanup)
+      BATS_TEMPDIR_CLEANUP=''
+      ;;
+    --errexit)
+      BATS_RUN_ERREXIT=1
+      ;;
+    --tempdir) # for internal test consumption only!
+      BATS_RUN_TMPDIR="$2"
+      shift
+      ;;
+    -x | --trace)
+      flags+=(--trace)
+      ;;
+    --print-output-on-failure)
+      flags+=(--print-output-on-failure)
+      ;;
+    --show-output-of-passing-tests)
+      flags+=(--show-output-of-passing-tests)
+      ;;
+    --verbose-run)
+      flags+=(--verbose-run)
+      ;;
+    --gather-test-outputs-in)
+      shift
+      output_dir="$1"
+      # Convert relative path to absolute to handle tests that change directory
+      # This ensures the path remains valid even if tests use 'cd'
+      if [[ $output_dir != /* ]]; then
+        output_dir="$PWD/$output_dir"
+      fi
+      if [ -d "$output_dir" ]; then
+        if ! find "$output_dir" -mindepth 1 -exec false {} + 2>/dev/null; then
+          abort --no-print-usage "Directory '$output_dir' must be empty for --gather-test-outputs-in"
+        fi
+      elif ! mkdir "$output_dir" 2>/dev/null; then
+        abort --no-print-usage "Could not create '$output_dir' for --gather-test-outputs-in"
+      fi
+      flags+=(--gather-test-outputs-in "$output_dir")
+      ;;
+    --setup-suite-file)
+      shift
+      setup_suite_file="$1"
+      ;;
+    --code-quote-style)
+      shift
+      BATS_CODE_QUOTE_STYLE="$1"
+      ;;
+    --filter-status)
+      shift
+      flags+=('--filter-status' "$1")
+      ;;
+    --filter-tags)
+      shift
+      flags+=('--filter-tags' "$1")
+      ;;
+    --line-reference-format)
+      shift
+      BATS_LINE_REFERENCE_FORMAT=$1
+      ;;
+    -*)
+      abort "Bad command line option '$1'"
+      ;;
+    *)
+      arguments+=("$1")
+      ;;
   esac
   shift
 done
@@ -437,15 +437,15 @@ if [[ -n "$report_formatter" ]]; then
   # only set BATS_REPORT_FILENAME if none was given
   if [[ -z "${BATS_REPORT_FILENAME:-}" ]]; then
     case "$report_formatter" in
-    tap | tap13)
-      BATS_REPORT_FILENAME="report.tap"
-      ;;
-    junit)
-      BATS_REPORT_FILENAME="report.xml"
-      ;;
-    *)
-      BATS_REPORT_FILENAME="report.log"
-      ;;
+      tap | tap13)
+        BATS_REPORT_FILENAME="report.tap"
+        ;;
+      junit)
+        BATS_REPORT_FILENAME="report.xml"
+        ;;
+      *)
+        BATS_REPORT_FILENAME="report.log"
+        ;;
     esac
   fi
 fi
@@ -462,22 +462,22 @@ if [[ "${BATS_CODE_QUOTE_STYLE-BATS_CODE_QUOTE_STYLE_UNSET}" == BATS_CODE_QUOTE_
 fi
 
 case "${BATS_CODE_QUOTE_STYLE}" in
-??)
-  BATS_BEGIN_CODE_QUOTE="${BATS_CODE_QUOTE_STYLE::1}"
-  BATS_END_CODE_QUOTE="${BATS_CODE_QUOTE_STYLE:1:1}"
-  export BATS_BEGIN_CODE_QUOTE BATS_END_CODE_QUOTE
-  ;;
-custom)
-  if [[ ${BATS_BEGIN_CODE_QUOTE-BATS_BEGIN_CODE_QUOTE_UNSET} == BATS_BEGIN_CODE_QUOTE_UNSET ||
-    ${BATS_END_CODE_QUOTE-BATS_BEGIN_CODE_QUOTE_UNSET} == BATS_BEGIN_CODE_QUOTE_UNSET ]]; then
-    printf "ERROR: BATS_CODE_QUOTE_STYLE=custom requires BATS_BEGIN_CODE_QUOTE and BATS_END_CODE_QUOTE to be set\n" >&2
+  ??)
+    BATS_BEGIN_CODE_QUOTE="${BATS_CODE_QUOTE_STYLE::1}"
+    BATS_END_CODE_QUOTE="${BATS_CODE_QUOTE_STYLE:1:1}"
+    export BATS_BEGIN_CODE_QUOTE BATS_END_CODE_QUOTE
+    ;;
+  custom)
+    if [[ ${BATS_BEGIN_CODE_QUOTE-BATS_BEGIN_CODE_QUOTE_UNSET} == BATS_BEGIN_CODE_QUOTE_UNSET ||
+      ${BATS_END_CODE_QUOTE-BATS_BEGIN_CODE_QUOTE_UNSET} == BATS_BEGIN_CODE_QUOTE_UNSET ]]; then
+      printf "ERROR: BATS_CODE_QUOTE_STYLE=custom requires BATS_BEGIN_CODE_QUOTE and BATS_END_CODE_QUOTE to be set\n" >&2
+      exit 1
+    fi
+    ;;
+  *)
+    printf "ERROR: Unknown BATS_CODE_QUOTE_STYLE: %s\n" "$BATS_CODE_QUOTE_STYLE" >&2
     exit 1
-  fi
-  ;;
-*)
-  printf "ERROR: Unknown BATS_CODE_QUOTE_STYLE: %s\n" "$BATS_CODE_QUOTE_STYLE" >&2
-  exit 1
-  ;;
+    ;;
 esac
 
 if [[ -n "$setup_suite_file" && ! -f "$setup_suite_file" ]]; then
@@ -485,7 +485,7 @@ if [[ -n "$setup_suite_file" && ! -f "$setup_suite_file" ]]; then
 fi
 
 filenames=()
-for ((i=0; i < ${#arguments[@]}; ++i)); do
+for ((i = 0; i < ${#arguments[@]}; ++i)); do
   filename="${arguments[i]}"
   if [[ -z "$filename" ]]; then
     abort --no-print-usage "File path must not be empty! (Path number $((i + 1)))"
@@ -539,7 +539,7 @@ bats_tee() { # <output-file> <command...>
   shift
   exec 3<&1 # use FD3 to get around pipe
   tee >(cat >&3) | "$@" >"$output_file" || status=$?
-  if (( status != 0 )); then
+  if ((status != 0)); then
     printf "ERROR: command \`%s\` failed with status %d\n" "$*" "$status" >&2
   fi
   return $status
