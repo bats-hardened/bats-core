@@ -3,18 +3,18 @@
 set -e
 
 case ${1#linux/} in
-  386)
-    TINI_PLATFORM=i386
-    ;;
-  arm/v7)
-    TINI_PLATFORM=armhf
-    ;;
-  arm/v6)
-    TINI_PLATFORM=armel
-    ;;
-  *)
-    TINI_PLATFORM=${1#linux/}
-    ;;
+386)
+  TINI_PLATFORM=i386
+  ;;
+arm/v7)
+  TINI_PLATFORM=armhf
+  ;;
+arm/v6)
+  TINI_PLATFORM=armel
+  ;;
+*)
+  TINI_PLATFORM=${1#linux/}
+  ;;
 esac
 
 echo "Installing tini for $TINI_PLATFORM"

@@ -138,25 +138,25 @@ parse_arguments() {
     CURRENT_ARG="${1}"
 
     case ${CURRENT_ARG} in
-      --major)
-        BUMP_INTERVAL="major"
-        ;;
-      # ---
-      --minor)
-        BUMP_INTERVAL="minor"
-        ;;
-      --patch)
-        BUMP_INTERVAL="patch"
-        ;;
-      -h | --help) usage ;;
-      -v | --version)
-        get_version
-        exit 0
-        ;;
-      --debug)
-        set -xe
-        ;;
-      -*) usage "${CURRENT_ARG}: unknown option" ;;
+    --major)
+      BUMP_INTERVAL="major"
+      ;;
+    # ---
+    --minor)
+      BUMP_INTERVAL="minor"
+      ;;
+    --patch)
+      BUMP_INTERVAL="patch"
+      ;;
+    -h | --help) usage ;;
+    -v | --version)
+      get_version
+      exit 0
+      ;;
+    --debug)
+      set -xe
+      ;;
+    -*) usage "${CURRENT_ARG}: unknown option" ;;
     esac
     shift
   done
