@@ -29,7 +29,6 @@ max_line_length = 120
 # tabs behave as if they were replaced by spaces with a tab stop of 2 characters
 tab_width = 2
 # trailing spaces indicates word wrap
-trim_trailing_spaces = false
 trim_trailing_whitespace = false
 
 [test/fixtures/bats/*_no_shellcheck.bats]
