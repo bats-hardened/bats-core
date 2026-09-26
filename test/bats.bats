@@ -141,6 +141,16 @@ setup() {
   [ "$status" -eq 0 ]
 }
 
+@test "recursive Bats invocation resolves an internal launcher symlink" {
+  local launcher="$BATS_TEST_TMPDIR/bats"
+  ln -s "$BATS_LIBEXEC/bats" "$launcher"
+  [[ -L $launcher ]] || skip "symbolic links aren't functional on OSTYPE=$OSTYPE"
+
+  unset BATS_LIBEXEC
+  reentrant_run "$launcher" "$FIXTURE_ROOT/passing.bats"
+  [ "$status" -eq 0 ]
+}
+
 @test "summary passing tests" {
   reentrant_run filter_control_sequences bats -p "$FIXTURE_ROOT/passing.bats"
   echo "$output"

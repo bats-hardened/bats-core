@@ -116,10 +116,29 @@ expand_path() {
   printf -v "$result" '%s/%s' "$dirname" "${path##*/}"
 }
 
-BATS_LIBEXEC="$(
-  cd -P "$(dirname "${BASH_SOURCE[0]}")"
+resolve_launcher_dir() {
+  local path=$1
+  local link_dir link_target
+  local remaining_links=40
+
+  while [[ -L $path ]]; do
+    ((remaining_links > 0)) || return 1
+    remaining_links=$((remaining_links - 1))
+    link_dir=$(cd -P "$(dirname "$path")" && pwd -P)
+    link_target=$(readlink "$path")
+    if [[ $link_target == /* ]]; then
+      path=$link_target
+    else
+      path=$link_dir/$link_target
+    fi
+  done
+
+  cd -P "$(dirname "$path")"
   pwd -P
-)"
+}
+
+BATS_LIBEXEC=$(resolve_launcher_dir "${BASH_SOURCE[0]}")
+unset -f resolve_launcher_dir
 export BATS_LIBEXEC
 export BATS_CWD="$PWD"
 export PATH="$BATS_LIBEXEC:$PATH"
