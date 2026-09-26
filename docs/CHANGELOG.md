@@ -30,14 +30,12 @@ The format is based on [Keep a Changelog][kac] and this project adheres to
 * make LICENSE.md machine-parsable (#1262)
 * preserve semaphore wrapper exit status (#1271)
 * protect Bats-owned execution variables (#1269)
-
-### Changed
-
-* use native Rush in tests on macOS runners, bump Rush version to 0.10.0 (#1260)
+* fix: support nested Bats runs in parallel (#1267)
 
 ### Changed
 
 * claim parallel semaphore slots atomically (#1259)
+* use native Rush in tests on macOS runners, bump Rush version to 0.10.0 (#1260)
 
 ### Documentation
 
