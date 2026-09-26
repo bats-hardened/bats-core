@@ -16,7 +16,7 @@ Running the bats-core test suite with `--jobs` exposed failures that the existin
 - Bash starts asynchronous jobs with `SIGINT` ignored when job control is off. Nested Bats processes launched by the semaphore worker inherited that state.
 - Recursive Bats invocations relied on the exported `bats_readlinkf` function. Rush does not preserve exported Bash functions.
 
-CI used `BATS_NUMBER_OF_PARALLEL_JOBS=2`, which is inherited by nested Bats invocations and makes the Ctrl-C tests skip. That differs intentionally from passing `--jobs 2` to the outer invocation only.
+Before this PR, CI's only parallel self-test job used `BATS_NUMBER_OF_PARALLEL_JOBS=2`. Because that variable is visible inside the self-tests, the Ctrl-C tests skipped. The Rush job selected the parallel backend but did not pass `--jobs`, so it still ran serially.
 
 ## Changes
 
