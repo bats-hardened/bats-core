@@ -49,6 +49,6 @@ This keeps the existing distinction:
 [alternative-pr]: https://github.com/bats-core/bats-core/pull/1234
 [ci-run]: https://github.com/bats-hardened/bats-core/actions/runs/36197956971
 [ebuild]: https://github.com/bats-hardened/gentoo-tests/blob/main/local_overlay/dev-util/bats/bats-9999.ebuild
-[test-branch]: https://github.com/bats-hardened/bats-core/tree/PR-review/fork/henning-schild/henning/staging0.ALTERNATIVE.new
+[test-branch]: https://github.com/bats-hardened/bats-core/tree/upstream-pr/10-support-parallel-self-tests-with---jobs
 [contributor]: https://github.com/bats-core/bats-core/blob/master/docs/CONTRIBUTING.md
 [coc]: https://github.com/bats-core/bats-core/blob/master/docs/CODE_OF_CONDUCT.md
