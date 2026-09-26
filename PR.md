@@ -39,16 +39,16 @@ This keeps the existing distinction:
 ## Verification
 
 - [GitHub Actions][ci-run]: full suite passed with Rush and `--jobs 2` on Ubuntu 22.04 and 24.04.
-- [Gentoo ebuild test][ebuild]: full suite passed with GNU Parallel, `--jobs "$(get_nproc)"`, and no `BATS_NUMBER_OF_PARALLEL_JOBS` override, using the [proposed bats-core branch][test-branch].
+- [Gentoo ebuild test][ebuild]: full suite passed with GNU Parallel, `--jobs "$(get_nproc)"`, and no `BATS_NUMBER_OF_PARALLEL_JOBS` override, using the [PR branch][pr-branch].
 - Existing environment-variable-based parallel CI coverage remains in place.
 
-- [ ] I have reviewed the [Contributor Guidelines][contributor].
-- [ ] I have reviewed the [Code of Conduct][coc] and agree to abide by it.
+- [x] I have reviewed the [Contributor Guidelines][contributor].
+- [x] I have reviewed the [Code of Conduct][coc] and agree to abide by it.
 
 [issue]: https://github.com/bats-core/bats-core/issues/1225
 [alternative-pr]: https://github.com/bats-core/bats-core/pull/1234
 [ci-run]: https://github.com/bats-hardened/bats-core/actions/runs/36197956971
 [ebuild]: https://github.com/bats-hardened/gentoo-tests/blob/main/local_overlay/dev-util/bats/bats-9999.ebuild
-[test-branch]: https://github.com/bats-hardened/bats-core/tree/upstream-pr/10-support-parallel-self-tests-with---jobs
+[pr-branch]: https://github.com/bats-hardened/bats-core/tree/upstream-pr/10-support-parallel-self-tests-with---jobs
 [contributor]: https://github.com/bats-core/bats-core/blob/master/docs/CONTRIBUTING.md
 [coc]: https://github.com/bats-core/bats-core/blob/master/docs/CODE_OF_CONDUCT.md
