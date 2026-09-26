@@ -6,7 +6,7 @@ fix: support parallel self-tests with `--jobs`
 
 [Fixes #1225][issue].
 
-[Alternative to #1234][alternative-pr].
+[Closes #1234][alternative-pr].
 
 ## Problem
 
