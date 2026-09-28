@@ -7,6 +7,12 @@ setup_file() {
   export SETUP_FILE_EXPORT_TEST=true
 }
 
+assert_setup_file_variable_is_readonly() {
+  reentrant_run env VARIABLE_TO_REASSIGN="$1" bats "$FIXTURE_ROOT/setup_file_variable_readonly.bats"
+  echo "$output"
+  [[ $status -eq 0 ]]
+}
+
 @test "setup_file is run once per file" {
   # shellcheck disable=SC2031,SC2030
   export LOG="$BATS_TEST_TMPDIR/setup_file_once.log"
@@ -14,9 +20,23 @@ setup_file() {
 }
 
 @test "BATS_FILE_FIRST_TEST_NUMBER_IN_SUITE is readonly in setup_file" {
-  reentrant_run bats "$FIXTURE_ROOT/first_test_number_readonly.bats"
-  echo "$output"
-  [[ $status -eq 0 ]]
+  assert_setup_file_variable_is_readonly BATS_FILE_FIRST_TEST_NUMBER_IN_SUITE
+}
+
+@test "BATS_TEST_FILENAME is readonly in setup_file" {
+  assert_setup_file_variable_is_readonly BATS_TEST_FILENAME
+}
+
+@test "BATS_TEST_FILE_NUMBER is readonly in setup_file" {
+  assert_setup_file_variable_is_readonly BATS_TEST_FILE_NUMBER
+}
+
+@test "BATS_FILE_TMPDIR is readonly in setup_file" {
+  assert_setup_file_variable_is_readonly BATS_FILE_TMPDIR
+}
+
+@test "BATS_SUITE_TMPDIR is readonly in setup_file" {
+  assert_setup_file_variable_is_readonly BATS_SUITE_TMPDIR
 }
 
 @test "teardown_file is run once per file" {
