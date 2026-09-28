@@ -7,14 +7,11 @@ setup_file() {
   export SETUP_FILE_EXPORT_TEST=true
 }
 
-assert_setup_file_variable_is_readonly() {
-  reentrant_run env VARIABLE_TO_REASSIGN="$1" bats "$FIXTURE_ROOT/setup_file_variable_readonly.bats"
-  echo "$output"
-  [[ $status -eq 0 ]]
-}
-
-assert_test_variable_is_readonly() {
-  reentrant_run env VARIABLE_TO_REASSIGN="$1" bats "$FIXTURE_ROOT/test_variable_readonly.bats"
+assert_variables_are_readonly() {
+  local scope=$1
+  shift
+  reentrant_run env REASSIGNMENT_SCOPE="$scope" VARIABLES_TO_REASSIGN="$*" \
+    bats "$FIXTURE_ROOT/variables_readonly.bats"
   echo "$output"
   [[ $status -eq 0 ]]
 }
@@ -25,40 +22,21 @@ assert_test_variable_is_readonly() {
   bats "$FIXTURE_ROOT/setup_file.bats"
 }
 
-@test "BATS_FILE_FIRST_TEST_NUMBER_IN_SUITE is readonly in setup_file" {
-  assert_setup_file_variable_is_readonly BATS_FILE_FIRST_TEST_NUMBER_IN_SUITE
+@test "Bats-owned variables are readonly in setup_file" {
+  assert_variables_are_readonly setup_file \
+    BATS_FILE_FIRST_TEST_NUMBER_IN_SUITE \
+    BATS_TEST_FILENAME \
+    BATS_TEST_FILE_NUMBER \
+    BATS_FILE_TMPDIR \
+    BATS_SUITE_TMPDIR
 }
 
-@test "BATS_TEST_FILENAME is readonly in setup_file" {
-  assert_setup_file_variable_is_readonly BATS_TEST_FILENAME
-}
-
-@test "BATS_TEST_FILE_NUMBER is readonly in setup_file" {
-  assert_setup_file_variable_is_readonly BATS_TEST_FILE_NUMBER
-}
-
-@test "BATS_FILE_TMPDIR is readonly in setup_file" {
-  assert_setup_file_variable_is_readonly BATS_FILE_TMPDIR
-}
-
-@test "BATS_SUITE_TMPDIR is readonly in setup_file" {
-  assert_setup_file_variable_is_readonly BATS_SUITE_TMPDIR
-}
-
-@test "BATS_TEST_FILENAME is readonly in test" {
-  assert_test_variable_is_readonly BATS_TEST_FILENAME
-}
-
-@test "BATS_TEST_FILE_NUMBER is readonly in test" {
-  assert_test_variable_is_readonly BATS_TEST_FILE_NUMBER
-}
-
-@test "BATS_FILE_TMPDIR is readonly in test" {
-  assert_test_variable_is_readonly BATS_FILE_TMPDIR
-}
-
-@test "BATS_SUITE_TMPDIR is readonly in test" {
-  assert_test_variable_is_readonly BATS_SUITE_TMPDIR
+@test "Bats-owned variables are readonly in test" {
+  assert_variables_are_readonly test \
+    BATS_TEST_FILENAME \
+    BATS_TEST_FILE_NUMBER \
+    BATS_FILE_TMPDIR \
+    BATS_SUITE_TMPDIR
 }
 
 @test "teardown_file is run once per file" {
