@@ -17,40 +17,40 @@ bats_semaphore_run() {
   shift
 
   # Before Bash 5.2, an EXIT trap can run after this function's local scope is gone.
-  semaphore_slot=
+  BATS_SEMAPHORE_ACQUISITION_SLOT=
   # `trap -p` prints a reusable trap definition, including its action.
-  saved_exit_trap=$(trap -p EXIT)
-  if [[ -n $saved_exit_trap ]]; then
+  BATS_SEMAPHORE_SAVED_EXIT_TRAP=$(trap -p EXIT)
+  if [[ -n $BATS_SEMAPHORE_SAVED_EXIT_TRAP ]]; then
     # Extract the action without changing this function's "$@".
-    saved_exit_trap=$(
-      eval "set -- ${saved_exit_trap#trap -- }"
+    BATS_SEMAPHORE_SAVED_EXIT_TRAP=$(
+      eval "set -- ${BATS_SEMAPHORE_SAVED_EXIT_TRAP#trap -- }"
       printf '%s' "$1"
     )
   fi
   trap bats_semaphore_acquisition_exit_trap EXIT
   bats_semaphore_acquire_slot
 
-  bats_semaphore_release_wrapper "$output_dir" "$semaphore_slot" "$@" &
+  bats_semaphore_release_wrapper "$output_dir" "$BATS_SEMAPHORE_ACQUISITION_SLOT" "$@" &
   wrapper_pid=$!
 
-  semaphore_slot=
-  if [[ -n $saved_exit_trap ]]; then
-    trap "$saved_exit_trap" EXIT
+  BATS_SEMAPHORE_ACQUISITION_SLOT=
+  if [[ -n $BATS_SEMAPHORE_SAVED_EXIT_TRAP ]]; then
+    trap "$BATS_SEMAPHORE_SAVED_EXIT_TRAP" EXIT
   else
     trap - EXIT
   fi
-  unset semaphore_slot saved_exit_trap
+  unset BATS_SEMAPHORE_ACQUISITION_SLOT BATS_SEMAPHORE_SAVED_EXIT_TRAP
   printf "%d\n" "$wrapper_pid"
 }
 
 bats_semaphore_acquisition_exit_trap() {
   local status=$?
   trap - EXIT
-  if [[ -n $semaphore_slot ]]; then
-    bats_semaphore_release_slot "$semaphore_slot" || true
+  if [[ -n $BATS_SEMAPHORE_ACQUISITION_SLOT ]]; then
+    bats_semaphore_release_slot "$BATS_SEMAPHORE_ACQUISITION_SLOT" || true
   fi
-  if [[ -n $saved_exit_trap ]]; then
-    eval "$saved_exit_trap"
+  if [[ -n $BATS_SEMAPHORE_SAVED_EXIT_TRAP ]]; then
+    eval "$BATS_SEMAPHORE_SAVED_EXIT_TRAP"
   fi
   exit "$status"
 }
@@ -75,7 +75,7 @@ bats_semaphore_release_wrapper() {
 }
 
 # block until a semaphore slot becomes free
-# stores the number of the acquired slot in semaphore_slot
+# stores the number of the acquired slot in BATS_SEMAPHORE_ACQUISITION_SLOT
 bats_semaphore_acquire_slot() {
   mkdir -p "$BATS_SEMAPHORE_DIR"
   local slot
@@ -84,7 +84,7 @@ bats_semaphore_acquire_slot() {
       # POSIX directory operations are atomic and serializable, so only one
       # process can successfully create a given slot directory.
       if mkdir "$BATS_SEMAPHORE_DIR/slot-$slot" 2>/dev/null; then
-        semaphore_slot=$slot
+        BATS_SEMAPHORE_ACQUISITION_SLOT=$slot
         return 0
       fi
     done
