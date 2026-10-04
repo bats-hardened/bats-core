@@ -12,12 +12,12 @@ BATS_LIBS_TMPDIR=
 
 cleanup() {
     local status=${1:-$?}
-    trap - EXIT INT TERM
+    trap - ERR EXIT INT TERM
     test -z "${BATS_LIBS_TMPDIR}" || test ! -d "${BATS_LIBS_TMPDIR}" || rm -fr "${BATS_LIBS_TMPDIR}"
     exit "$status"
 }
 
-trap 'cleanup $?' EXIT
+trap 'cleanup $?' ERR EXIT
 trap 'cleanup 130' INT
 trap 'cleanup 143' TERM
 
