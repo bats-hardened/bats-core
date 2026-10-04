@@ -16,8 +16,7 @@ bats_semaphore_run() {
   local wrapper_pid
   shift
 
-  # These must not be local: Bash 5.1 may unwind this function before it
-  # runs the EXIT trap below.
+  # Before Bash 5.2, an EXIT trap can run after this function's local scope is gone.
   semaphore_slot=
   # Save the caller's EXIT trap definition.
   saved_exit_trap=$(trap -p EXIT)
