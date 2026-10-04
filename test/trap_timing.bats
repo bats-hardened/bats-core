@@ -109,7 +109,7 @@ fixtures trap_timing
     BATS_FAULT_CAPTURE=TMPDIR \
     BATS_FAULT_CAPTURE_FILE="$capture_file" \
     BATS_FAULT_ACTION=TERM \
-    bash "$BATS_ROOT/docker/install_libs.sh" support 0.3.0
+    bash "$BATS_TEST_DIRNAME/../docker/install_libs.sh" support 0.3.0
 
   read -r temporary_dir <"$capture_file"
   [ "$status" -eq 143 ]
@@ -126,7 +126,7 @@ fixtures trap_timing
     BATS_FAULT_COMMAND='*# -ne 2*' \
     BATS_FAULT_ACTION=TERM-then-mark \
     BATS_FAULT_CONTINUED_FILE="$continued_file" \
-    bash "$BATS_ROOT/docker/install_libs.sh" support 0.3.0
+    bash "$BATS_TEST_DIRNAME/../docker/install_libs.sh" support 0.3.0
 
   [ ! -e "$continued_file" ]
 }

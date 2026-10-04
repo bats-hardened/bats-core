@@ -21,7 +21,7 @@ bats_semaphore_run() {
   # `trap -p` prints a reusable trap definition, including its action.
   BATS_SEMAPHORE_SAVED_EXIT_TRAP=$(trap -p EXIT)
   if [[ -n $BATS_SEMAPHORE_SAVED_EXIT_TRAP ]]; then
-    # Extract the action without changing this function's "$@".
+    # Extract the trap action
     BATS_SEMAPHORE_SAVED_EXIT_TRAP=$(
       eval "set -- ${BATS_SEMAPHORE_SAVED_EXIT_TRAP#trap -- }"
       printf '%s' "$1"
@@ -35,6 +35,7 @@ bats_semaphore_run() {
 
   BATS_SEMAPHORE_ACQUISITION_SLOT=
   if [[ -n $BATS_SEMAPHORE_SAVED_EXIT_TRAP ]]; then
+    # shellcheck disable=SC2064 # Restore the action saved from the caller's EXIT trap.
     trap "$BATS_SEMAPHORE_SAVED_EXIT_TRAP" EXIT
   else
     trap - EXIT
