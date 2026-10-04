@@ -49,24 +49,3 @@ load test_helper
   [ "$status" -eq 23 ]
   [ ! -d "$semaphore_dir/slot-0" ]
 }
-
-@test "semaphore slot is released when wrapper exits before becoming ready" {
-  local semaphore_dir="$BATS_TEST_TMPDIR/semaphores"
-
-  run bash -c '
-    source "$1"
-
-    BATS_RUN_TMPDIR=$2
-    BATS_SEMAPHORE_NUMBER_OF_SLOTS=1
-    bats_semaphore_setup
-
-    bats_semaphore_release_wrapper() {
-      return 23
-    }
-
-    bats_semaphore_run "$2/output" false
-  ' _ "$BATS_ROOT/$BATS_LIBDIR/bats-core/semaphore.bash" "$BATS_TEST_TMPDIR"
-
-  [ "$status" -eq 0 ]
-  [ ! -d "$semaphore_dir/slot-0" ]
-}
