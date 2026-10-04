@@ -20,36 +20,33 @@ bats_semaphore_run() {
   # EXIT traps may run after this function's local scope has been unwound.
   # Keep the acquisition state global until the wrapper has installed its
   # cleanup trap.
-  BATS_SEMAPHORE_ACQUIRED_SLOT=''
-  BATS_SEMAPHORE_SAVED_EXIT_TRAP=$(trap -p EXIT)
+  semaphore_slot=''
+  saved_exit_trap=$(trap -p EXIT)
   trap bats_semaphore_acquisition_exit_trap EXIT
-  bats_semaphore_acquire_slot BATS_SEMAPHORE_ACQUIRED_SLOT
+  bats_semaphore_acquire_slot
 
   mkfifo "$ready_pipe"
-  bats_semaphore_release_wrapper "$output_dir" "$BATS_SEMAPHORE_ACQUIRED_SLOT" "$@" >"$ready_pipe" &
+  bats_semaphore_release_wrapper "$output_dir" "$semaphore_slot" "$@" >"$ready_pipe" &
   wrapper_pid=$!
 
   if ! IFS= read -r <"$ready_pipe"; then
-    bats_semaphore_release_slot "$BATS_SEMAPHORE_ACQUIRED_SLOT" || true
+    bats_semaphore_release_slot "$semaphore_slot" || true
   fi
   rm -f "$ready_pipe"
 
-  BATS_SEMAPHORE_ACQUIRED_SLOT=
-  if [[ -n $BATS_SEMAPHORE_SAVED_EXIT_TRAP ]]; then
-    eval "$BATS_SEMAPHORE_SAVED_EXIT_TRAP"
+  semaphore_slot=
+  if [[ -n $saved_exit_trap ]]; then
+    eval "$saved_exit_trap"
   else
     trap - EXIT
   fi
-  unset BATS_SEMAPHORE_ACQUIRED_SLOT BATS_SEMAPHORE_SAVED_EXIT_TRAP
+  unset semaphore_slot saved_exit_trap
   printf "%d\n" "$wrapper_pid"
 }
 
 bats_semaphore_acquisition_exit_trap() {
   local status=$?
-  local semaphore_slot=$BATS_SEMAPHORE_ACQUIRED_SLOT
-  local saved_exit_trap=$BATS_SEMAPHORE_SAVED_EXIT_TRAP
   trap - EXIT
-  unset BATS_SEMAPHORE_ACQUIRED_SLOT BATS_SEMAPHORE_SAVED_EXIT_TRAP
   if [[ -n $semaphore_slot ]]; then
     bats_semaphore_release_slot "$semaphore_slot" || true
   fi
@@ -81,20 +78,19 @@ bats_semaphore_release_wrapper() {
 }
 
 # block until a semaphore slot becomes free
-# stores the number of the acquired slot in the named variable
+# stores the number of the acquired slot in semaphore_slot
 bats_semaphore_acquire_slot() {
-  local output_variable=$1
   mkdir -p "$BATS_SEMAPHORE_DIR"
   local slot
   while true; do
     for ((slot = 0; slot < BATS_SEMAPHORE_NUMBER_OF_SLOTS; ++slot)); do
-      printf -v "$output_variable" '%d' "$slot"
+      semaphore_slot=$slot
       # POSIX directory operations are atomic and serializable, so only one
       # process can successfully create a given slot directory.
       if mkdir "$BATS_SEMAPHORE_DIR/slot-$slot" 2>/dev/null; then
         return 0
       fi
-      printf -v "$output_variable" ''
+      semaphore_slot=
     done
     sleep 1
   done
