@@ -18,8 +18,15 @@ bats_semaphore_run() {
 
   # Before Bash 5.2, an EXIT trap can run after this function's local scope is gone.
   semaphore_slot=
-  # Save the caller's EXIT trap definition.
+  # `trap -p` prints a reusable trap definition, including its action.
   saved_exit_trap=$(trap -p EXIT)
+  if [[ -n $saved_exit_trap ]]; then
+    # Extract the action without changing this function's "$@".
+    saved_exit_trap=$(
+      eval "set -- ${saved_exit_trap#trap -- }"
+      printf '%s' "$1"
+    )
+  fi
   trap bats_semaphore_acquisition_exit_trap EXIT
   bats_semaphore_acquire_slot
 
@@ -28,7 +35,7 @@ bats_semaphore_run() {
 
   semaphore_slot=
   if [[ -n $saved_exit_trap ]]; then
-    eval "$saved_exit_trap"
+    trap "$saved_exit_trap" EXIT
   else
     trap - EXIT
   fi
@@ -43,8 +50,7 @@ bats_semaphore_acquisition_exit_trap() {
     bats_semaphore_release_slot "$semaphore_slot" || true
   fi
   if [[ -n $saved_exit_trap ]]; then
-    (eval "$saved_exit_trap"; exit "$status")
-    exit $?
+    eval "$saved_exit_trap"
   fi
   exit "$status"
 }
