@@ -13,38 +13,43 @@ bats_semaphore_setup() {
 # gather the output of the command in files in the given directory
 bats_semaphore_run() {
   local output_dir=$1
-  local ready_file="$output_dir/semaphore-ready"
-  local semaphore_slot='' wrapper_pid running_jobs saved_exit_trap
-  local BATS_SEMAPHORE_READY_FILE=$ready_file
+  local ready_pipe="$output_dir/semaphore-ready"
+  local wrapper_pid
   shift
 
-  saved_exit_trap=$(trap -p EXIT)
+  # EXIT traps may run after this function's local scope has been unwound.
+  # Keep the acquisition state global until the wrapper has installed its
+  # cleanup trap.
+  BATS_SEMAPHORE_ACQUIRED_SLOT=''
+  BATS_SEMAPHORE_SAVED_EXIT_TRAP=$(trap -p EXIT)
   trap bats_semaphore_acquisition_exit_trap EXIT
-  bats_semaphore_acquire_slot semaphore_slot
+  bats_semaphore_acquire_slot BATS_SEMAPHORE_ACQUIRED_SLOT
 
-  bats_semaphore_release_wrapper "$output_dir" "$semaphore_slot" "$@" &
+  mkfifo "$ready_pipe"
+  bats_semaphore_release_wrapper "$output_dir" "$BATS_SEMAPHORE_ACQUIRED_SLOT" "$@" >"$ready_pipe" &
   wrapper_pid=$!
 
-  while [[ ! -e $ready_file ]]; do
-    running_jobs=" $(jobs -pr) "
-    if [[ $running_jobs != *" $wrapper_pid "* ]]; then
-      break
-    fi
-    sleep 0.01
-  done
+  if ! IFS= read -r <"$ready_pipe"; then
+    bats_semaphore_release_slot "$BATS_SEMAPHORE_ACQUIRED_SLOT" || true
+  fi
+  rm -f "$ready_pipe"
 
-  semaphore_slot=
-  if [[ -n $saved_exit_trap ]]; then
-    eval "$saved_exit_trap"
+  BATS_SEMAPHORE_ACQUIRED_SLOT=
+  if [[ -n $BATS_SEMAPHORE_SAVED_EXIT_TRAP ]]; then
+    eval "$BATS_SEMAPHORE_SAVED_EXIT_TRAP"
   else
     trap - EXIT
   fi
+  unset BATS_SEMAPHORE_ACQUIRED_SLOT BATS_SEMAPHORE_SAVED_EXIT_TRAP
   printf "%d\n" "$wrapper_pid"
 }
 
 bats_semaphore_acquisition_exit_trap() {
   local status=$?
+  local semaphore_slot=$BATS_SEMAPHORE_ACQUIRED_SLOT
+  local saved_exit_trap=$BATS_SEMAPHORE_SAVED_EXIT_TRAP
   trap - EXIT
+  unset BATS_SEMAPHORE_ACQUIRED_SLOT BATS_SEMAPHORE_SAVED_EXIT_TRAP
   if [[ -n $semaphore_slot ]]; then
     bats_semaphore_release_slot "$semaphore_slot" || true
   fi
@@ -64,10 +69,7 @@ bats_semaphore_release_wrapper() {
   shift 2 # all other parameters will be use for the command to execute
 
   trap 'status=$?; [[ -z $semaphore_name ]] || bats_semaphore_release_slot "$semaphore_name"; exit $status' EXIT
-  if [[ -n ${BATS_SEMAPHORE_READY_FILE:-} ]]; then
-    : >"$BATS_SEMAPHORE_READY_FILE"
-    unset BATS_SEMAPHORE_READY_FILE
-  fi
+  printf 'ready\n'
   mkdir -p "$output_dir"
   "$@" 2>"$output_dir/stderr" >"$output_dir/stdout"
   local status=$?
