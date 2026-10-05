@@ -1,0 +1,44 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "forkProcessing": "enabled",
+  "separateMajorMinor": false,
+  "enabledManagers": [
+    "docker-compose",
+    "dockerfile",
+    "github-actions",
+    "npm",
+    "pep621",
+    "pip_requirements",
+    "pre-commit"
+  ],
+  "pre-commit": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "matchManagers": ["docker-compose", "dockerfile"],
+      "labels": ["docker", "dependencies", "no changelog"],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "labels": ["github-actions", "dependencies", "no changelog"],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "matchManagers": ["npm"],
+      "labels": ["npm", "dependencies", "no changelog"],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "matchManagers": ["pep621", "pip_requirements"],
+      "labels": ["pip", "dependencies", "no changelog"],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "matchManagers": ["pre-commit"],
+      "labels": ["pre-commit", "dependencies", "no changelog"],
+      "minimumReleaseAge": "3 days"
+    }
+  ]
+}
