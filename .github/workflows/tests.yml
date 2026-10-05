@@ -86,7 +86,7 @@ jobs:
           bash -c "time ${{ matrix.env_vars }} bin/bats  --print-output-on-failure test"
 
   unset_variables:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Check unset variables
@@ -204,7 +204,7 @@ jobs:
             - ''
             # also test running (recursively!) in parallel
             - '-e BATS_NUMBER_OF_PARALLEL_JOBS=2'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Run test on bash version ${{ matrix.version }}
@@ -216,7 +216,7 @@ jobs:
           time docker run -e "CI=$CI" -it ${{ matrix.env_vars }} "bats/bats:bash-${{ matrix.version }}"  --print-output-on-failure /opt/bats/test
 
   lib64-install:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
         checks: write
         pull-requests: write
@@ -239,7 +239,7 @@ jobs:
             test-results/**/*.xml
 
   alpine:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     container: alpine:latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -253,7 +253,7 @@ jobs:
           time ./bin/bats  --print-output-on-failure test/
 
   freebsd:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       matrix:
         packages:
@@ -269,14 +269,14 @@ jobs:
             time ./bin/bats --print-output-on-failure test/
 
   find_broken_symlinks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # list symlinks that are broken and force non-zero exit if there are any
       - run: "! find . -xtype l | grep ."
 
   rpm:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     container: almalinux:8
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -297,7 +297,7 @@ jobs:
         run: bats --print-output-on-failure --filter-tags !dep:install_sh test/
 
   dockerfile:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 

@@ -9,8 +9,8 @@ permissions:
 
 jobs:
     dockerhub:
-        runs-on: ubuntu-latest
-        permissions: 
+        runs-on: ubuntu-26.04
+        permissions:
           packages: write
         steps:
         - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
