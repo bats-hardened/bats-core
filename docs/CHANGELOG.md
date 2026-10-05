@@ -31,6 +31,7 @@ The format is based on [Keep a Changelog][kac] and this project adheres to
 * preserve semaphore wrapper exit status (#1271)
 * protect Bats-owned execution variables (#1269)
 * fix: support nested Bats runs in parallel (#1267)
+* clean up timeout watchdog processes (#1270)
 
 ### Changed
 
