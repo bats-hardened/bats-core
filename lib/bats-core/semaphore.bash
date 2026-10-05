@@ -28,8 +28,7 @@ bats_semaphore_release_wrapper() {
   local semaphore_name="$2"
   shift 2 # all other parameters will be use for the command to execute
 
-  # shellcheck disable=SC2064 # we want to expand the semaphore_name right now!
-  trap "status=$?; bats_semaphore_release_slot '$semaphore_name'; exit $status" EXIT
+  trap 'status=$?; bats_semaphore_release_slot "$semaphore_name"; exit "$status"' EXIT
 
   # Bash starts asynchronous jobs with SIGINT ignored when job control is off.
   # Restore it so commands run as parallel tests can handle SIGINT themselves.
