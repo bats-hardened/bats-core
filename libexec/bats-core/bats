@@ -338,25 +338,8 @@ if [[ ! $BATS_LINE_REFERENCE_FORMAT =~ (custom|comma_line|colon|uri) ]]; then
   abort "Invalid BATS_LINE_REFERENCE_FORMAT '$BATS_LINE_REFERENCE_FORMAT' (e.g. via --line-reference-format)"
 fi
 
-if [[ -n "${BATS_RUN_TMPDIR:-}" ]]; then
-  if [[ -d "$BATS_RUN_TMPDIR" ]]; then
-    printf "Error: BATS_RUN_TMPDIR (%s) already exists\n" "$BATS_RUN_TMPDIR" >&2
-    printf "Reusing old run directories can lead to unexpected results ... aborting!\n" >&2
-    exit 1
-  elif ! mkdir -p "$BATS_RUN_TMPDIR"; then
-    printf "Error: Failed to create BATS_RUN_TMPDIR (%s)\n" "$BATS_RUN_TMPDIR" >&2
-    exit 1
-  fi
-elif ! BATS_RUN_TMPDIR=$(mktemp -d "${BATS_TMPDIR}/bats-run-XXXXXX"); then
-  printf "Error: Failed to create BATS_RUN_TMPDIR (%s) with mktemp\n" "${BATS_TMPDIR}/bats-run-XXXXXX" >&2
-  exit 1
-fi
-
-export BATS_WARNING_FILE="${BATS_RUN_TMPDIR}/warnings.log"
-export BATS_RUN_ERREXIT=${BATS_RUN_ERREXIT:-}
-
 bats_exit_trap() {
-  if [[ -s "$BATS_WARNING_FILE" ]]; then
+  if [[ -n "${BATS_WARNING_FILE:-}" && -s "$BATS_WARNING_FILE" ]]; then
     local pre_cat='' post_cat=''
     if [[ $formatter == pretty ]]; then
       pre_cat=$'\x1B[31m'
@@ -367,14 +350,35 @@ bats_exit_trap() {
     printf "%s" "$post_cat"
   fi >&2
 
-  if [[ -n "$BATS_TEMPDIR_CLEANUP" ]]; then
-    rm -rf "$BATS_RUN_TMPDIR"
-  else
-    printf "BATS_RUN_TMPDIR: %s\n" "$BATS_RUN_TMPDIR" >&2
+  if [[ -n "${BATS_RUN_TMPDIR:-}" ]]; then
+    if [[ -n "$BATS_TEMPDIR_CLEANUP" ]]; then
+      rm -rf "$BATS_RUN_TMPDIR"
+    else
+      printf "BATS_RUN_TMPDIR: %s\n" "$BATS_RUN_TMPDIR" >&2
+    fi
   fi
 }
 
+if [[ -n "${BATS_RUN_TMPDIR:-}" && -d "$BATS_RUN_TMPDIR" ]]; then
+  printf "Error: BATS_RUN_TMPDIR (%s) already exists\n" "$BATS_RUN_TMPDIR" >&2
+  printf "Reusing old run directories can lead to unexpected results ... aborting!\n" >&2
+  exit 1
+fi
+
 trap bats_exit_trap EXIT
+
+if [[ -n "${BATS_RUN_TMPDIR:-}" ]]; then
+  if ! mkdir -p "$BATS_RUN_TMPDIR"; then
+    printf "Error: Failed to create BATS_RUN_TMPDIR (%s)\n" "$BATS_RUN_TMPDIR" >&2
+    exit 1
+  fi
+elif ! BATS_RUN_TMPDIR=$(mktemp -d "${BATS_TMPDIR}/bats-run-XXXXXX"); then
+  printf "Error: Failed to create BATS_RUN_TMPDIR (%s) with mktemp\n" "${BATS_TMPDIR}/bats-run-XXXXXX" >&2
+  exit 1
+fi
+
+export BATS_WARNING_FILE="${BATS_RUN_TMPDIR}/warnings.log"
+export BATS_RUN_ERREXIT=${BATS_RUN_ERREXIT:-}
 
 if [[ "$formatter" != "tap" ]]; then
   flags+=('-x')
