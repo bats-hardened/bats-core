@@ -20,6 +20,9 @@ _bats_inject_fault() {
   RUNNING_JOB)
     printf '%s\n' "$running_job" >"$BATS_FAULT_CAPTURE_FILE"
     ;;
+  TMPDIR)
+    printf '%s\n' "$TMPDIR" >"$BATS_FAULT_CAPTURE_FILE"
+    ;;
   esac
 
   case ${BATS_FAULT_ACTION:-exit} in
@@ -30,6 +33,13 @@ _bats_inject_fault() {
     # $BASHPID is the shell currently being debugged. A command substitution
     # forks a subshell that is already reaped before `kill` can use its PID.
     kill -TERM "$BASHPID"
+    ;;
+  TERM)
+    kill -TERM "$$"
+    ;;
+  TERM-then-mark)
+    kill -TERM "$$"
+    : >"$BATS_FAULT_CONTINUED_FILE"
     ;;
   esac
 }
