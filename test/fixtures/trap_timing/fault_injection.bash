@@ -17,6 +17,9 @@ _bats_inject_fault() {
   trap - DEBUG
 
   case ${BATS_FAULT_CAPTURE:-} in
+  TMPDIR)
+    printf '%s\n' "$TMPDIR" >"$BATS_FAULT_CAPTURE_FILE"
+    ;;
   RUNNING_JOB)
     printf '%s\n' "$running_job" >"$BATS_FAULT_CAPTURE_FILE"
     ;;
@@ -28,6 +31,10 @@ _bats_inject_fault() {
     ;;
   TERM)
     kill -TERM "$$"
+    ;;
+  TERM-then-mark)
+    kill -TERM "$$"
+    : >"$BATS_FAULT_CONTINUED_FILE"
     ;;
   TERM-current-shell)
     # $BASHPID is the shell currently being debugged. A command substitution
