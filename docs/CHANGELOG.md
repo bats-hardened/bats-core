@@ -33,6 +33,7 @@ The format is based on [Keep a Changelog][kac] and this project adheres to
 * fix missing newlines in `$BATS_TMPDIR`-error handling checks at startup (#1194)
 * fix: support nested Bats runs in parallel (#1267)
 * clean up timeout watchdog processes (#1270)
+* stop install_libs after cleanup signals (#1272)
 
 ### Changed
 
