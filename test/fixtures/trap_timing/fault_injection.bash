@@ -26,6 +26,9 @@ _bats_inject_fault() {
   exit)
     exit "${BATS_FAULT_STATUS:-23}"
     ;;
+  TERM)
+    kill -TERM "$$"
+    ;;
   TERM-current-shell)
     # $BASHPID is the shell currently being debugged. A command substitution
     # forks a subshell that is already reaped before `kill` can use its PID.

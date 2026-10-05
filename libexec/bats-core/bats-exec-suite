@@ -218,8 +218,6 @@ IFS=$'\n' read -d '' -r -a BATS_UNIQUE_TEST_FILENAMES < <(printf "%s\n" "$@" | n
 source "$BATS_ROOT/$BATS_LIBDIR/bats-core/tracing.bash"
 bats_setup_tracing
 
-trap bats_suite_exit_trap EXIT
-
 exec 3<&1
 
 # shellcheck disable=SC2317,SC2329
@@ -253,6 +251,8 @@ bats_suite_exit_trap() {
   fi
   exit "$bats_exec_suite_status"
 } >&3
+
+trap bats_suite_exit_trap EXIT
 
 bats_run_teardown_suite() {
   local bats_teardown_suite_status=0
