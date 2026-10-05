@@ -29,6 +29,7 @@ The format is based on [Keep a Changelog][kac] and this project adheres to
 * pretty formatter colored the summary green when tests timed out or did not run (#538, #1263)
 * fix: support nested Bats runs in parallel (#1267)
 * protect Bats-owned execution variables (#1269)
+* clean up timeout watchdog processes (#1270)
 
 ### Changed
 
