@@ -46,7 +46,7 @@ fixtures trap_timing
       bats_status=$?
       printf "nested Bats status: %s\n" "$bats_status"
       printf "sleep process %s survived watchdog termination: %s\n" \
-        "$sleep_pid" "\${sleep_was_running:-no}"
+        "$sleep_pid" "${sleep_was_running:-no}"
       [[ $bats_status -eq 0 && -z $sleep_was_running ]]
     ' _ "$BATS_ROOT/bin/bats" "$BATS_TEST_DIRNAME/fixtures/bats/passing.bats" \
     "$BATS_TEST_TMPDIR" "$sleep_pid_file"
