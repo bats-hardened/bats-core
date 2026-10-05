@@ -31,6 +31,7 @@ The format is based on [Keep a Changelog][kac] and this project adheres to
 * protect Bats-owned execution variables (#1269)
 * clean up timeout watchdog processes (#1270)
 * preserve semaphore wrapper exit status (#1271)
+* stop install_libs after cleanup signals (#1272)
 
 ### Changed
 
