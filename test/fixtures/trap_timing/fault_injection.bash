@@ -27,7 +27,9 @@ _bats_inject_fault() {
     exit "${BATS_FAULT_STATUS:-23}"
     ;;
   TERM-current-shell)
-    kill -TERM "$(sh -c 'printf %s "$PPID"')"
+    # $BASHPID is the shell currently being debugged. A command substitution
+    # forks a subshell that is already reaped before `kill` can use its PID.
+    kill -TERM "$BASHPID"
     ;;
   esac
 }
