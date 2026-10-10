@@ -4,7 +4,7 @@ It runs a minimal passing Bats test 1,000 times with a timeout and checks for a 
 
 ```shell
 @test fast_exit {
-  :' '
+  :
 }
 ```
 
@@ -14,7 +14,7 @@ Results:
   1. 985 orphaned sleeps / 1,000 runs
   2. 895 orphaned sleeps / 1,000 runs
 - windows-2022:
-  1. job aborted when Win2025 job failed (first test version)
+  1. canceled by the matrix's default fail-fast behavior after the Windows 2025 job failed (first test version)
   2. 726 orphaned sleeps / 1,000 runs
 
 So your intuition was right: for this fast-test workload, the behavior is not a rare one-in-many-runs event.
@@ -28,32 +28,31 @@ It therefore does not by itself prove the exact original failure mechanism, but 
 
 <summary>Unfold for test workflow</summary>
 
-### Test workflow
-
-> Change trigger to your branch.
+```yaml
+# Change trigger to your branch.
 
 name: Timeout watchdog race diagnostic
 
 on:
-workflow_dispatch:
-push:
-branches:
-- wip/upstream-pr/12-PROOF-fix-timeout-watchdog-cleanup
+  workflow_dispatch:
+  push:
+    branches:
+      - wip/upstream-pr/12-PROOF-fix-timeout-watchdog-cleanup
 
 permissions:
-contents: read
+  contents: read
 
 jobs:
-timeout_watchdog_race_diagnostic:
-strategy:
-fail-fast: false
-matrix:
-os: ['windows-2022', 'windows-2025']
-runs-on: ${{ matrix.os }}
-steps:
-- uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-with:
-persist-credentials: false
+  timeout_watchdog_race_diagnostic:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['windows-2022', 'windows-2025']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Measure orphaned timeout sleeps
         shell: bash
@@ -93,5 +92,6 @@ persist-credentials: false
           printf 'result: %d orphaned timeout sleep(s) in %d iteration(s)\n' "$orphans" "$iterations"
           ((orphans == 0))
 
+```
 
 </details>
