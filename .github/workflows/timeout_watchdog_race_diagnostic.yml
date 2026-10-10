@@ -12,6 +12,7 @@ permissions:
 jobs:
   timeout_watchdog_race_diagnostic:
     strategy:
+      fail-fast: false
       matrix:
         os: ['windows-2022', 'windows-2025']
     runs-on: ${{ matrix.os }}
@@ -38,15 +39,22 @@ jobs:
           orphans=0
           for ((iteration = 1; iteration <= iterations; ++iteration)); do
             BATS_TEST_TIMEOUT="$timeout" bin/bats "$fixture" >/dev/null
+            iteration_orphans=0
             for pid in $(find_timeout_sleeps); do
               if ! printf '%s\n' "$initial_pids" | grep -Fxq "$pid"; then
-                printf 'orphaned timeout sleep after iteration %d: %s\n' "$iteration" "$pid" >&2
-                ps -ef >&2
+                printf 'iteration %d/%d: orphaned sleep %s\n' "$iteration" "$iterations" "$pid"
                 kill -KILL "$pid" || true
+                ((++iteration_orphans))
                 ((++orphans))
               fi
             done
+            if ((iteration_orphans == 0)); then
+              printf 'iteration %d/%d: no orphan (total: %d)\n' "$iteration" "$iterations" "$orphans"
+            else
+              printf 'iteration %d/%d: %d orphan(s) (total: %d)\n' \
+                "$iteration" "$iterations" "$iteration_orphans" "$orphans"
+            fi
           done
 
-          printf 'orphaned timeout sleeps: %d/%d\n' "$orphans" "$iterations"
+          printf 'result: %d orphaned timeout sleep(s) in %d iteration(s)\n' "$orphans" "$iterations"
           ((orphans == 0))
