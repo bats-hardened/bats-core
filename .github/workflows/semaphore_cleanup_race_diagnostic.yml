@@ -96,10 +96,13 @@ jobs:
           failures=0
           for ((iteration = 1; iteration <= ITERATIONS; ++iteration)); do
             rmdir_log="$RUNNER_TEMP/semaphore-rmdir-$iteration.log"
+            syscall_trace="$RUNNER_TEMP/semaphore-syscalls-$iteration"
             : > "$rmdir_log"
             if output=$(PATH="$RUNNER_TEMP/semaphore-rmdir-shim:$PATH" \
               SEMAPHORE_RMDIR_LOG="$rmdir_log" \
-              BATS_PARALLEL_BINARY_NAME=rush bin/bats \
+              strace -ff -ttt -s 512 -o "$syscall_trace" \
+                -e trace=mkdir,mkdirat,rmdir,unlink,unlinkat,rename,renameat,renameat2 \
+              env BATS_PARALLEL_BINARY_NAME=rush bin/bats \
               --filter 'Parallel mode works on MacOS with over subscription' \
               test/bats.bats 2>&1); then
               printf 'iteration %d/%d: pass\n' "$iteration" "$ITERATIONS"
@@ -108,6 +111,8 @@ jobs:
               printf 'iteration %d/%d: failure %d\n%s\nrmdir journal:\n' \
                 "$iteration" "$ITERATIONS" "$failures" "$output"
               cat "$rmdir_log"
+              printf 'filesystem syscall trace:\n'
+              rg '/semaphores/|slot-[0-9]+' "${syscall_trace}".* || true
             fi
           done
 
