@@ -33,6 +33,10 @@ jobs:
         run: |
           curl -sSfL https://github.com/shenwei356/rush/releases/download/v0.10.0/rush_linux_amd64.tar.gz | sudo tar xzf - -C /usr/local/bin
 
+      - name: Install rg (ripgrep)
+        run: |
+          sudo apt-get update && sudo apt-get install -y ripgrep
+
       - name: Print nested output on semaphore cleanup failure
         run: |
           sed -i '/\[\[ "$output" != \*"No such file or directory"\* \]\] || exit 1/c\
