@@ -45,7 +45,8 @@ jobs:
         run: |
           semaphore_file=lib/bats-core/semaphore.bash
           sed -i '/        printf "%d\\n" "$slot"/i\
-                [[ -z ${SEMAPHORE_RMDIR_LOG:-} ]] || printf "%s semaphore_pid=%s parent_pid=%s event=acquire slot=%s\\n" "$(date "+%FT%T.%N%z")" "$BASHPID" "$PPID" "$slot" >> "$SEMAPHORE_RMDIR_LOG"' "$semaphore_file"
+                semaphore_slot_path="$BATS_SEMAPHORE_DIR/slot-$slot"\
+                [[ -z ${SEMAPHORE_RMDIR_LOG:-} ]] || printf "%s semaphore_pid=%s parent_pid=%s event=acquire slot=%s path=%s mount_ns=%s object=%s\\n" "$(date "+%FT%T.%N%z")" "$BASHPID" "$PPID" "$slot" "$semaphore_slot_path" "$(readlink /proc/self/ns/mnt)" "$(stat -Lc "device=%d,inode=%i" "$semaphore_slot_path")" >> "$SEMAPHORE_RMDIR_LOG"' "$semaphore_file"
 
           shim_dir="$RUNNER_TEMP/semaphore-rmdir-shim"
           install -d "$shim_dir"
@@ -62,11 +63,13 @@ jobs:
           EOF
           cat > "$shim_dir/rmdir" <<'EOF'
           #!/usr/bin/env bash
+          mount_ns=$(readlink /proc/self/ns/mnt)
+          object=$(stat -Lc 'device=%d,inode=%i' "$1" 2>/dev/null || printf missing)
           status=0
           /usr/bin/rmdir "$@" || status=$?
           if [[ "$1" == */semaphores/slot-* ]]; then
-            printf '%s rmdir_pid=%s parent_pid=%s status=%s path=%s\n' \
-              "$(date '+%FT%T.%N%z')" "$BASHPID" "$PPID" "$status" "$1" \
+            printf '%s rmdir_pid=%s parent_pid=%s status=%s path=%s mount_ns=%s object_before=%s\n' \
+              "$(date '+%FT%T.%N%z')" "$BASHPID" "$PPID" "$status" "$1" "$mount_ns" "$object" \
               >> "${SEMAPHORE_RMDIR_LOG:?}"
           fi
           exit "$status"
