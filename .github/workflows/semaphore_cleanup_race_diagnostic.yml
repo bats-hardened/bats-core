@@ -43,6 +43,10 @@ jobs:
 
       - name: Trace semaphore slot removals
         run: |
+          semaphore_file=lib/bats-core/semaphore.bash
+          sed -i '/        printf "%d\\n" "$slot"/i\
+                [[ -z ${SEMAPHORE_RMDIR_LOG:-} ]] || printf "%s semaphore_pid=%s parent_pid=%s event=acquire slot=%s\\n" "$(date "+%FT%T.%N%z")" "$BASHPID" "$PPID" "$slot" >> "$SEMAPHORE_RMDIR_LOG"' "$semaphore_file"
+
           shim_dir="$RUNNER_TEMP/semaphore-rmdir-shim"
           install -d "$shim_dir"
           cat > "$shim_dir/mkdir" <<'EOF'
