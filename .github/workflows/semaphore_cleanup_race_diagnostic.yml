@@ -43,6 +43,17 @@ jobs:
         run: |
           shim_dir="$RUNNER_TEMP/semaphore-rmdir-shim"
           install -d "$shim_dir"
+          cat > "$shim_dir/mkdir" <<'EOF'
+          #!/usr/bin/env bash
+          status=0
+          /usr/bin/mkdir "$@" || status=$?
+          if [[ "$1" == */semaphores/slot-* ]]; then
+            printf '%s mkdir_pid=%s parent_pid=%s status=%s path=%s\n' \
+              "$(date '+%FT%T.%N%z')" "$BASHPID" "$PPID" "$status" "$1" \
+              >> "${SEMAPHORE_RMDIR_LOG:?}"
+          fi
+          exit "$status"
+          EOF
           cat > "$shim_dir/rmdir" <<'EOF'
           #!/usr/bin/env bash
           status=0
