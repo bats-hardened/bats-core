@@ -44,6 +44,14 @@ jobs:
       - name: Trace semaphore slot removals
         run: |
           semaphore_file=lib/bats-core/semaphore.bash
+          sed -i '/      if mkdir "$BATS_SEMAPHORE_DIR\/slot-$slot" 2>\/dev\/null; then/c\
+              if mkdir "$BATS_SEMAPHORE_DIR/slot-$slot" 2>/dev/null; then\
+                mkdir_status=0\
+              else\
+                mkdir_status=$?\
+              fi\
+              [[ -z ${SEMAPHORE_RMDIR_LOG:-} ]] || printf "%s semaphore_pid=%s parent_pid=%s event=mkdir-result status=%s type=%s command=%s path=%s\\n" "$(date "+%FT%T.%N%z")" "$BASHPID" "$PPID" "$mkdir_status" "$(type -t mkdir)" "$(type -P mkdir)" "$BATS_SEMAPHORE_DIR/slot-$slot" >> "$SEMAPHORE_RMDIR_LOG"\
+              if (( mkdir_status == 0 )); then' "$semaphore_file"
           sed -i '/        printf "%d\\n" "$slot"/i\
                 semaphore_slot_path="$BATS_SEMAPHORE_DIR/slot-$slot"\
                 [[ -z ${SEMAPHORE_RMDIR_LOG:-} ]] || printf "%s semaphore_pid=%s parent_pid=%s event=acquire slot=%s path=%s mount_ns=%s object=%s\\n" "$(date "+%FT%T.%N%z")" "$BASHPID" "$PPID" "$slot" "$semaphore_slot_path" "$(readlink /proc/self/ns/mnt)" "$(stat -Lc "device=%d,inode=%i" "$semaphore_slot_path")" >> "$SEMAPHORE_RMDIR_LOG"' "$semaphore_file"
@@ -74,7 +82,7 @@ jobs:
           fi
           exit "$status"
           EOF
-          chmod +x "$shim_dir/rmdir"
+          chmod +x "$shim_dir/mkdir" "$shim_dir/rmdir"
 
       - name: Reproduce semaphore cleanup race
         env:
