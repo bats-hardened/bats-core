@@ -1,0 +1,58 @@
+name: Semaphore cleanup race diagnostic
+
+on:
+  workflow_dispatch:
+    inputs:
+      iterations:
+        description: Number of attempts per runner
+        required: false
+        default: '100'
+        type: string
+  push:
+    branches:
+      - wip/upstream-pr/11-protect-Bats-owned-execution-variables
+
+permissions:
+  contents: read
+
+jobs:
+  semaphore_cleanup_race_diagnostic:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-22.04', 'ubuntu-24.04', 'ubuntu-26.04']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install rush
+        run: |
+          curl -sSfL https://github.com/shenwei356/rush/releases/download/v0.10.0/rush_linux_amd64.tar.gz | sudo tar xzf - -C /usr/local/bin
+
+      - name: Reproduce semaphore cleanup race
+        env:
+          ITERATIONS: ${{ inputs.iterations || '100' }}
+        run: |
+          if ! [[ "$ITERATIONS" =~ ^[1-9][0-9]*$ ]]; then
+            printf 'iterations must be a positive integer, got: %s\n' "$ITERATIONS" >&2
+            exit 2
+          fi
+
+          failures=0
+          for ((iteration = 1; iteration <= ITERATIONS; ++iteration)); do
+            if output=$(BATS_PARALLEL_BINARY_NAME=rush bin/bats \
+              --filter 'Parallel mode works on MacOS with over subscription' \
+              test/bats.bats 2>&1); then
+              printf 'iteration %d/%d: pass\n' "$iteration" "$ITERATIONS"
+            else
+              ((++failures))
+              printf 'iteration %d/%d: failure %d\n%s\n' \
+                "$iteration" "$ITERATIONS" "$failures" "$output"
+            fi
+          done
+
+          printf 'result: %d failure(s) in %d iteration(s) on %s\n' \
+            "$failures" "$ITERATIONS" "${{ matrix.os }}"
+          ((failures == 0))
