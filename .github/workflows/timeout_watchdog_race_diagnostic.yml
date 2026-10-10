@@ -1,0 +1,52 @@
+name: Timeout watchdog race diagnostic
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - wip/upstream-pr/12-PROOF-fix-timeout-watchdog-cleanup
+
+permissions:
+  contents: read
+
+jobs:
+  timeout_watchdog_race_diagnostic:
+    strategy:
+      matrix:
+        os: ['windows-2022', 'windows-2025']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Measure orphaned timeout sleeps
+        shell: bash
+        run: |
+          timeout=31337
+          iterations=1000
+          fixture="$RUNNER_TEMP/timeout-watchdog-race.bats"
+          printf '%s\n' '@test fast_exit { :' '}' > "$fixture"
+
+          find_timeout_sleeps() {
+            ps -ef | awk -v timeout="$timeout" '
+              $NF == timeout && $(NF - 1) ~ /(^|[/\\])sleep(\.exe)?$/ { print $2 }
+            '
+          }
+
+          initial_pids=$(find_timeout_sleeps)
+          orphans=0
+          for ((iteration = 1; iteration <= iterations; ++iteration)); do
+            BATS_TEST_TIMEOUT="$timeout" bin/bats "$fixture" >/dev/null
+            for pid in $(find_timeout_sleeps); do
+              if ! printf '%s\n' "$initial_pids" | grep -Fxq "$pid"; then
+                printf 'orphaned timeout sleep after iteration %d: %s\n' "$iteration" "$pid" >&2
+                ps -ef >&2
+                kill -KILL "$pid" || true
+                ((++orphans))
+              fi
+            done
+          done
+
+          printf 'orphaned timeout sleeps: %d/%d\n' "$orphans" "$iterations"
+          ((orphans == 0))
