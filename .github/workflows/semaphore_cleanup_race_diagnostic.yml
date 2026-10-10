@@ -6,7 +6,7 @@ on:
       iterations:
         description: Number of attempts per runner
         required: false
-        default: '100'
+        default: '1000'
         type: string
   push:
     branches:
@@ -31,9 +31,17 @@ jobs:
         run: |
           curl -sSfL https://github.com/shenwei356/rush/releases/download/v0.10.0/rush_linux_amd64.tar.gz | sudo tar xzf - -C /usr/local/bin
 
+      - name: Print nested output on semaphore cleanup failure
+        run: |
+          sed -i '/\[\[ "$output" != \*"No such file or directory"\* \]\] || exit 1/c\
+            if [[ "$output" == *"No such file or directory"* ]]; then\
+              printf "%s\\n" "$output"\
+              exit 1\
+            fi' test/bats.bats
+
       - name: Reproduce semaphore cleanup race
         env:
-          ITERATIONS: ${{ inputs.iterations || '100' }}
+          ITERATIONS: ${{ inputs.iterations || '1000' }}
         run: |
           if ! [[ "$ITERATIONS" =~ ^[1-9][0-9]*$ ]]; then
             printf 'iterations must be a positive integer, got: %s\n' "$ITERATIONS" >&2
