@@ -39,6 +39,23 @@ jobs:
               exit 1\
             fi' test/bats.bats
 
+      - name: Trace semaphore slot removals
+        run: |
+          shim_dir="$RUNNER_TEMP/semaphore-rmdir-shim"
+          install -d "$shim_dir"
+          cat > "$shim_dir/rmdir" <<'EOF'
+          #!/usr/bin/env bash
+          status=0
+          /usr/bin/rmdir "$@" || status=$?
+          if [[ "$1" == */semaphores/slot-* ]]; then
+            printf '%s rmdir_pid=%s parent_pid=%s status=%s path=%s\n' \
+              "$(date '+%FT%T.%N%z')" "$BASHPID" "$PPID" "$status" "$1" \
+              >> "${SEMAPHORE_RMDIR_LOG:?}"
+          fi
+          exit "$status"
+          EOF
+          chmod +x "$shim_dir/rmdir"
+
       - name: Reproduce semaphore cleanup race
         env:
           ITERATIONS: ${{ inputs.iterations || '1000' }}
@@ -50,14 +67,19 @@ jobs:
 
           failures=0
           for ((iteration = 1; iteration <= ITERATIONS; ++iteration)); do
-            if output=$(BATS_PARALLEL_BINARY_NAME=rush bin/bats \
+            rmdir_log="$RUNNER_TEMP/semaphore-rmdir-$iteration.log"
+            : > "$rmdir_log"
+            if output=$(PATH="$RUNNER_TEMP/semaphore-rmdir-shim:$PATH" \
+              SEMAPHORE_RMDIR_LOG="$rmdir_log" \
+              BATS_PARALLEL_BINARY_NAME=rush bin/bats \
               --filter 'Parallel mode works on MacOS with over subscription' \
               test/bats.bats 2>&1); then
               printf 'iteration %d/%d: pass\n' "$iteration" "$ITERATIONS"
             else
               ((++failures))
-              printf 'iteration %d/%d: failure %d\n%s\n' \
+              printf 'iteration %d/%d: failure %d\n%s\nrmdir journal:\n' \
                 "$iteration" "$ITERATIONS" "$failures" "$output"
+              cat "$rmdir_log"
             fi
           done
 
