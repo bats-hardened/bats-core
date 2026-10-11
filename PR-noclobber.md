@@ -1,6 +1,4 @@
-# Urgent: Claim parallel slots with noclobber instead of mkdir
-
-_Urgent as in before next release._
+# Claim parallel slots with noclobber instead of mkdir
 
 After the recent move from files to dirs for parallelization this may sound like an Aprils fools joke - it's not.
 You can chuckle though :wink:
@@ -8,17 +6,17 @@ You can chuckle though :wink:
 ## Problem: Ubuntu 26 uses non-mutex Rust mkdir
 
 Ubuntu 26 (LTS) uses a faulty Rust `mkdir` which is not mutex.
+The current GitHub Actions `ubuntu-26.04` runner has this broken `mkdir` and starts replacing `ubuntu-latest` on 2026-10-19.
 
 `mkdir` can **exit 0 even though the kernel returned EEXIST** for the underlying mkdir(2) syscall.  
 Two processes racing to create the same directory then both believe they succeeded — which silently breaks the classic mkdir-as-mutex shell pattern.
 
 - uutils/coreutils:
-  - [issue 1397](https://github.com/uutils/coreutils/issues/13970) opened 2026-08-16
+  - [issue 13970](https://github.com/uutils/coreutils/issues/13970) opened 2026-08-16
   - [PR 13986](https://github.com/uutils/coreutils/pull/13986) merged 2026-08-28
   - [Release notes for 0.11.0](https://github.com/uutils/coreutils/releases/tag/0.11.0) released 2026-08-31; mention PR 13986
 
-Upcoming Ubuntu 27 will likely not yet have a patched `coreutils`.  
-And with Ubuntu 26 being LTS - `mkdir` can't be trusted on random systems or in images for years to come.
+With Ubuntu 26 being LTS - `mkdir` can't be trusted on random systems or in images for years to come.
 
 ## Solution: Create file with set -C, which uses O_EXCL.
 
@@ -45,7 +43,7 @@ If the file does not exist: the kernel creates it and returns an open file descr
 If it already exists: the kernel returns EEXIST; Bash makes the redirection fail.
 The kernel performs pathname lookup and exclusive creation as one atomic operation.
 
-Bash redirection only exists for files, this can't use dirs.
+Bash redirection only exists for files, so this can't use dirs.
 
 ---
 
