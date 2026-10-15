@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog][kac] and this project adheres to
 
 ### Fixed
 
+* resolve Bats internal tools independently of `PATH` mutations in `setup_suite`
 * avoid false duplicate errors for dynamic tests with argument prefixes, and
   detect duplicates with non-space `IFS` separators (#1249)
 * fix incorrect stack traces when `load` or `bats_load_library` fails (#1186, #1250)
