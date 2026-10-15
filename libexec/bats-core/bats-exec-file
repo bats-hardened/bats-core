@@ -64,6 +64,8 @@ if [[ ! -f "$filename" ]]; then
 fi
 
 export BATS_TEST_FILENAME="$filename"
+export BATS_BASH="$BASH"
+readonly BATS_BASH BATS_LIBEXEC
 
 # shellcheck source=lib/bats-core/preprocessing.bash
 # shellcheck disable=SC2153

@@ -64,6 +64,11 @@ setup() {
   EXPECTED_VALUE=exported_var reentrant_run -0 bats "$FIXTURE_ROOT/exported_vars/"
 }
 
+@test "Bats runtime variables are readonly in setup_suite" {
+  reentrant_run -0 env VARIABLES_TO_REASSIGN='BATS_BASH BATS_LIBEXEC' \
+    bats "$FIXTURE_ROOT/variables_readonly/"
+}
+
 @test "PATH mutations in setup_suite do not break Bats internals" {
   reentrant_run -0 bats "$FIXTURE_ROOT/path_mutation/"
   [ "${lines[0]}" = "1..1" ]
@@ -96,11 +101,12 @@ setup() {
   chmod +x "$libexec_with_spaces/bats-exec-file"
 
   REENTRANT_RUN_PRESERVE+=(BATS_LIBEXEC)
-  BATS_LIBEXEC="$libexec_with_spaces" \
+  reentrant_run -0 env \
+    BATS_LIBEXEC="$libexec_with_spaces" \
     PATH_MUTATION_VALUE="$(dirname "$parallel_path"):/usr/bin:/bin" \
-    reentrant_run -0 bats-exec-suite -j 2 \
-      --setup-suite-file "$FIXTURE_ROOT/path_mutation/setup_suite.bash" \
-      "$FIXTURE_ROOT/path_mutation/test.bats"
+    bats-exec-suite -j 2 \
+    --setup-suite-file "$FIXTURE_ROOT/path_mutation/setup_suite.bash" \
+    "$FIXTURE_ROOT/path_mutation/test.bats"
 
   [ "${lines[0]}" = "1..1" ]
   [ "${lines[1]}" = "ok 1 passing" ]

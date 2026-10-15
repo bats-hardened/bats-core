@@ -26,6 +26,7 @@ if [[ -z ${BATS_LIBEXEC:-} ]]; then
   export BATS_LIBEXEC
 fi
 export BATS_BASH="$BASH"
+readonly BATS_BASH BATS_LIBEXEC
 
 abort() {
   printf 'Error: %s\n' "$1" >&2
