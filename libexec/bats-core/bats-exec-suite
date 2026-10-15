@@ -25,6 +25,7 @@ if [[ -z ${BATS_LIBEXEC:-} ]]; then
   BATS_LIBEXEC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   export BATS_LIBEXEC
 fi
+export BATS_BASH="$BASH"
 
 abort() {
   printf 'Error: %s\n' "$1" >&2
@@ -322,8 +323,7 @@ fi
 
 if [[ "$num_jobs" -gt 1 ]] && [[ -z "$bats_no_parallelize_across_files" ]]; then
   parallel_flags=(--keep-order --jobs "$num_jobs")
-  bats_exec_file=
-  bats_internal_path bats_exec_file bats-exec-file
+  bats_exec_file="$BATS_LIBEXEC/bats-exec-file"
   if (( BATS_ABORT_ON_FAILURE )); then
     parallel_flags+=('--halt' 'now,fail=1')
   fi
@@ -331,7 +331,7 @@ if [[ "$num_jobs" -gt 1 ]] && [[ -z "$bats_no_parallelize_across_files" ]]; then
   # shellcheck disable=SC2086,SC2068
   # we need to handle the quoting of ${flags[@]} ourselves,
   # because parallel can only quote it as one
-  "${parallel_binary_name}" "${parallel_flags[@]}" -- "$(printf "%q" "$bats_exec_file")" "$(printf "%q " "${flags[@]}")" "{#}" "{}" "$TESTS_LIST_FILE" <<< "$(printf "%s\n" "${BATS_UNIQUE_TEST_FILENAMES[@]}")" 2>&1 || bats_exec_suite_status=1
+  "${parallel_binary_name}" "${parallel_flags[@]}" -- "$(printf "%q" "$BATS_BASH")" "$(printf "%q" "$bats_exec_file")" "$(printf "%q " "${flags[@]}")" "{#}" "{}" "$TESTS_LIST_FILE" <<< "$(printf "%s\n" "${BATS_UNIQUE_TEST_FILENAMES[@]}")" 2>&1 || bats_exec_suite_status=1
 else
   file_index=0
   for filename in "${BATS_UNIQUE_TEST_FILENAMES[@]}"; do

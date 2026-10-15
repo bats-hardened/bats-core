@@ -92,7 +92,7 @@ setup() {
   printf '%s\n' \
     '#!/usr/bin/env bash' \
     'printf "bats-exec-file\n" >>"$EXEC_FILE_MARKER"' \
-    'exec "$REAL_EXEC_FILE" "$@"' >"$libexec_with_spaces/bats-exec-file"
+    'exec "$BATS_BASH" "$REAL_EXEC_FILE" "$@"' >"$libexec_with_spaces/bats-exec-file"
   chmod +x "$libexec_with_spaces/bats-exec-file"
 
   REENTRANT_RUN_PRESERVE+=(BATS_LIBEXEC)
