@@ -428,6 +428,6 @@ jobs:
 
   super-linter:
     name: Run Super-Linter
-    uses: bats-hardened/.github/.github/workflows/super-linter.yml@44fd251ecb1b4ca6fd2537eaa65be75b9be0395d # v1.1.1-beta01
+    uses: bats-hardened/.github/.github/workflows/super-linter.yml@bb0630e4f173ba1baeb9b579aff9e95f5178ff58 # v1.1.1-beta02
     permissions:
       contents: read
