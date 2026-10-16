@@ -84,7 +84,7 @@ check_parallel_tests() { # <expected maximum parallelity>
   touch "$BATS_SEMAPHORE_DIR/slot-0"
 
   # shellcheck disable=SC2016
-  run --separate-stderr bash -c 'BATS_SEMAPHORE_DEBUG=; source "$1"; bats_semaphore_acquire_slot semaphore_slot' \
+  run --separate-stderr bash -c 'source "$1"; bats_semaphore_acquire_slot semaphore_slot' \
     bash "$BATS_ROOT/$BATS_LIBDIR/bats-core/semaphore.bash"
   [[ $status -eq 0 ]]
   [[ -z $stderr ]]
