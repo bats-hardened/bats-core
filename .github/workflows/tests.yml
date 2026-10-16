@@ -18,6 +18,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}${{ github.event_name == 'release' && '-release' || '' }}
   cancel-in-progress: true
 
+env:
+  BATS_SEMAPHORE_DEBUG: 1
+
 permissions:
   contents: read
 
