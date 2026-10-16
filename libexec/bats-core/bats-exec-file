@@ -65,7 +65,7 @@ fi
 
 export BATS_TEST_FILENAME="$filename"
 export BATS_BASH="$BASH"
-readonly BATS_BASH
+readonly BATS_BASH BATS_LIBEXEC
 
 # shellcheck source=lib/bats-core/preprocessing.bash
 # shellcheck disable=SC2153
@@ -94,7 +94,7 @@ bats_run_setup_file() {
   BATS_TEARDOWN_FILE_COMPLETED=
   # shellcheck disable=2034
   BATS_ERROR_STATUS= # used in tracing.bash
-  
+
   touch "$BATS_OUT"
   bats_setup_tracing
   trap 'bats_file_teardown_trap' EXIT
@@ -116,7 +116,7 @@ bats_run_teardown_file() {
   local bats_teardown_file_status=0
   # avoid running the therdown trap due to errors in teardown_file
   trap 'bats_file_exit_trap' EXIT
-  
+
   bats_set_stacktrace_limit
 
   # rely on bats_error_trap to catch failures

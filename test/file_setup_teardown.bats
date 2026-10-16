@@ -25,6 +25,7 @@ assert_variables_are_readonly() {
 @test "Bats-owned variables are readonly in setup_file" {
   assert_variables_are_readonly setup_file \
     BATS_BASH \
+    BATS_LIBEXEC \
     BATS_FILE_FIRST_TEST_NUMBER_IN_SUITE \
     BATS_TEST_FILENAME \
     BATS_TEST_FILE_NUMBER \
@@ -35,10 +36,15 @@ assert_variables_are_readonly() {
 @test "Bats-owned variables are readonly in test" {
   assert_variables_are_readonly test \
     BATS_BASH \
+    BATS_LIBEXEC \
     BATS_TEST_FILENAME \
     BATS_TEST_FILE_NUMBER \
     BATS_FILE_TMPDIR \
     BATS_SUITE_TMPDIR
+}
+
+@test "setup_file cannot redirect BATS_LIBEXEC" {
+  reentrant_run -0 bats "$FIXTURE_ROOT/libexec_mutation.bats"
 }
 
 @test "teardown_file is run once per file" {

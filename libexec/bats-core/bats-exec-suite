@@ -23,10 +23,10 @@ fi
 
 if [[ -z ${BATS_LIBEXEC:-} ]]; then
   BATS_LIBEXEC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  export BATS_LIBEXEC
 fi
+export BATS_LIBEXEC
 export BATS_BASH="$BASH"
-readonly BATS_BASH
+readonly BATS_BASH BATS_LIBEXEC
 
 abort() {
   printf 'Error: %s\n' "$1" >&2

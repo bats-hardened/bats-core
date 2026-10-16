@@ -61,7 +61,7 @@ fi
 
 export BATS_BASH="$BASH"
 # shellcheck disable=SC2034 # BATS_SUITE_TMPDIR is exposed to user code
-readonly BATS_BASH BATS_TEST_FILENAME BATS_TEST_FILE_NUMBER BATS_FILE_TMPDIR BATS_SUITE_TMPDIR
+readonly BATS_BASH BATS_LIBEXEC BATS_TEST_FILENAME BATS_TEST_FILE_NUMBER BATS_FILE_TMPDIR BATS_SUITE_TMPDIR
 
 bats_create_test_tmpdirs() {
   local tests_tmpdir="${BATS_RUN_TMPDIR}/test"
@@ -264,7 +264,7 @@ bats_find_processes_of() { # <parent-pid>
 
 # send signal to process and all its descendants
 bats_kill_processes_of() { # <parent-pid> [<signal>]
-  local -ir parent_pid="${1?}" 
+  local -ir parent_pid="${1?}"
   local -r signal=${2?}
   bats_find_processes_of "$parent_pid"
   kill "-$signal" "${child_pids[@]}"
@@ -284,7 +284,7 @@ bats_start_timeout_countdown() { # <timeout>
   (
     # with sleep in foreground this shell wouldn't receive signals,
     # so we use wait below and kill sleep explicitly when signalled to do so
-    # On Windows the TERM signal does not seem to shut down sleep -> 
+    # On Windows the TERM signal does not seem to shut down sleep ->
     # close all fds to avoid blocking IO when sleep does not turn off
     (eval exec {0..255}">&-"; sleep "$timeout") &
     # shellcheck disable=SC2064

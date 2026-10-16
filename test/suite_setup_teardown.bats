@@ -114,16 +114,26 @@ setup() {
   chmod +x "$libexec_with_spaces/bats-exec-file"
 
   REENTRANT_RUN_PRESERVE+=(BATS_LIBEXEC)
-  BATS_LIBEXEC="$libexec_with_spaces" \
+  reentrant_run -0 env \
+    BATS_LIBEXEC="$libexec_with_spaces" \
     PATH_MUTATION_VALUE="$(dirname "$parallel_path"):/usr/bin:/bin" \
-    reentrant_run -0 bats-exec-suite -j 2 \
-      --setup-suite-file "$FIXTURE_ROOT/path_mutation/setup_suite.bash" \
-      "$FIXTURE_ROOT/path_mutation/test.bats"
+    bats-exec-suite -j 2 \
+    --setup-suite-file "$FIXTURE_ROOT/path_mutation/setup_suite.bash" \
+    "$FIXTURE_ROOT/path_mutation/test.bats"
 
   [ "${lines[0]}" = "1..1" ]
   [ "${lines[1]}" = "ok 1 passing" ]
   [ "${#lines[@]}" -eq 2 ]
   [ "$(wc -l <"$exec_file_marker")" -eq 1 ]
+}
+
+@test "BATS_LIBEXEC is readonly in setup_suite" {
+  reentrant_run -0 env VARIABLES_TO_REASSIGN=BATS_LIBEXEC \
+    bats "$FIXTURE_ROOT/variables_readonly/"
+}
+
+@test "setup_suite cannot redirect BATS_LIBEXEC" {
+  reentrant_run -0 bats "$FIXTURE_ROOT/libexec_mutation/"
 }
 
 @test "syntax errors in setup_suite.bash are reported and lead to non zero exit code" {
