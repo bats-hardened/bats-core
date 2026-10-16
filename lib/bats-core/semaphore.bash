@@ -58,17 +58,14 @@ bats_semaphore_acquire_slot() {
     for ((slot = 0; slot < BATS_SEMAPHORE_NUMBER_OF_SLOTS; ++slot)); do
       # Bash noclobber creates the file with O_CREAT|O_EXCL, so only one
       # process can successfully claim a given slot. Occupied slots are an
-      # expected failed-redirection case, so normal runs suppress their diagnostic.
-      if [[ -n ${BATS_SEMAPHORE_DEBUG:-} ]]; then
-        : > "$BATS_SEMAPHORE_DIR/slot-$slot" || continue
-      else
-        : 2>/dev/null > "$BATS_SEMAPHORE_DIR/slot-$slot" || continue
+      # expected failed-redirection case, so suppress their diagnostic.
+      if : 2>/dev/null > "$BATS_SEMAPHORE_DIR/slot-$slot"; then
+        if [[ -n $restore_noclobber ]]; then
+          set +C
+        fi
+        printf -v "$output_var" "%d" "$slot"
+        return 0
       fi
-      if [[ -n $restore_noclobber ]]; then
-        set +C
-      fi
-      printf -v "$output_var" "%d" "$slot"
-      return 0
     done
     sleep 1
   done
