@@ -73,6 +73,40 @@ check_parallel_tests() { # <expected maximum parallelity>
   run -1 bats_semaphore_acquire_slot semaphore_slot
 }
 
+@test "semaphore acquisition is quiet for occupied slots" {
+  # shellcheck source=lib/bats-core/semaphore.bash
+  source "$BATS_ROOT/$BATS_LIBDIR/bats-core/semaphore.bash"
+  BATS_SEMAPHORE_DIR="$BATS_TEST_TMPDIR/semaphore"
+  # shellcheck disable=SC2030
+  BATS_SEMAPHORE_NUMBER_OF_SLOTS=2
+  export BATS_SEMAPHORE_DIR BATS_SEMAPHORE_NUMBER_OF_SLOTS
+  mkdir -p "$BATS_SEMAPHORE_DIR"
+  touch "$BATS_SEMAPHORE_DIR/slot-0"
+
+  # shellcheck disable=SC2016
+  run --separate-stderr bash -c 'source "$1"; bats_semaphore_acquire_slot semaphore_slot' \
+    bash "$BATS_ROOT/$BATS_LIBDIR/bats-core/semaphore.bash"
+  [[ $status -eq 0 ]]
+  [[ -z $stderr ]]
+}
+
+@test "semaphore acquisition reports occupied slots when debugging" {
+  BATS_SEMAPHORE_DIR="$BATS_TEST_TMPDIR/semaphore"
+  # shellcheck disable=SC2030
+  BATS_SEMAPHORE_NUMBER_OF_SLOTS=2
+  export BATS_SEMAPHORE_DIR BATS_SEMAPHORE_NUMBER_OF_SLOTS
+  mkdir -p "$BATS_SEMAPHORE_DIR"
+  touch "$BATS_SEMAPHORE_DIR/slot-0"
+
+  export BATS_SEMAPHORE_DEBUG=1
+  # shellcheck disable=SC2016
+  run --separate-stderr bash -c 'source "$1"; bats_semaphore_acquire_slot semaphore_slot' \
+    bash "$BATS_ROOT/$BATS_LIBDIR/bats-core/semaphore.bash"
+  unset BATS_SEMAPHORE_DEBUG
+  [[ $status -eq 0 ]]
+  [[ -n $stderr ]]
+}
+
 @test "parallel test execution with --jobs" {
   # shellcheck disable=SC2031,SC2030
   export FILE_MARKER
