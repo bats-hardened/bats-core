@@ -65,7 +65,7 @@ bats_warn_about_redefinition() { # <function name>
   if [[ -n "${BATS_LAST_DEFINED_TEST_FUNCTION:-}" ]]; then
     readonly -f "$BATS_LAST_DEFINED_TEST_FUNCTION"
   fi
-  declare -g BATS_LAST_DEFINED_TEST_FUNCTION=$funcname
+  BATS_LAST_DEFINED_TEST_FUNCTION=$funcname
 }
 
 # override test_functions.bash's version to use it for test registration
@@ -112,6 +112,7 @@ bats_test_function() {
   # dereferencing ${test_names[*]} fails on older bash versions when empty -> check before
   if [[ ${#test_names[@]} -gt 0 && " ${test_names[*]} " == *" $line "* ]]; then
       test_dupes+=("$line")
+      bats_gather_tests_duplicate=1
   fi
   test_names+=("$line")
 
@@ -322,7 +323,8 @@ bats_gather_tests_source_exit_trap() {
 }
 
 bats_gather_tests_for_file() {
-  local test_names=() test_dupes=() included_tests=() excluded_tests=()
+  # shellcheck disable=SC2034 # used by the generated test source
+  local test_names=() test_dupes=() included_tests=() excluded_tests=() bats_gather_tests_duplicate=
 
   trap bats_gather_tests_source_exit_trap EXIT
   bats_setup_tracing

@@ -95,6 +95,8 @@ IFS=,
 
       # shellcheck disable=SC2154 # encoded_name is declare via bats_encode_test_name
       printf 'bats_test_function --description %q  --tags "%s" --tags "%s" -- %s; ' "$name" "${test_tags[*]-}" "${file_tags[*]-}" "$encoded_name"
+      # shellcheck disable=SC2016 # expand in the generated test source
+      printf 'if [[ -n "${bats_gather_tests_duplicate:-}" ]]; then return; fi; '
       printf 'bats_warn_about_redefinition "%s"; ' "${encoded_name:?}"
       printf '%s() { %s%s\n' "${encoded_name:?}" "$lead" "$body" || :
 

@@ -1687,7 +1687,7 @@ END_OF_ERR_MSG
   [ "${#lines[*]}" -eq 5 ]
 
   reentrant_run bats --tap "$FIXTURE_ROOT/issue-923-after.bats"
-  [[ "$output" == *"issue-923-after.bats: line 12: test_collision_defined_after_test: readonly function"* ]] || false
+  [[ "$output" =~ issue-923-after\.bats(\.src)?:\ line\ 12:\ test_collision_defined_after_test:\ readonly\ function ]] || false
 
   reentrant_run bats --tap "$FIXTURE_ROOT/issue-923-setup.bats"
   [[ "$output" == *"issue-923-setup.bats: line 2: test_collision_defined_in_setup: readonly function"* ]] || false
