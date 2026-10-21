@@ -110,6 +110,32 @@ setup() {
   [ "${#lines[@]}" -gt 3 ]
 }
 
+@test "warns when Windows System32 precedes Bash on PATH" {
+  local bash_wrapper_directory="$BATS_TEST_TMPDIR/bash-wrapper" system32_path
+  mkdir "$bash_wrapper_directory"
+  cat >"$bash_wrapper_directory/bash" <<EOF
+#!$BASH
+exec "\$BASH" "\$@"
+EOF
+  chmod +x "$bash_wrapper_directory/bash"
+
+  for system32_path in /c/Windows/System32 C:/Windows/System32 'C:\Windows\System32' 'C:/Windows/System32;C:/other'; do
+    run --separate-stderr env PATH="$bash_wrapper_directory:$system32_path:$PATH" "$BASH" "$BATS_ROOT/bin/bats" --version
+
+    [ "$status" -eq 0 ]
+    [[ "$output" == 'Bats '* ]]
+    [[ "$stderr" == "WARNING: PATH contains Windows System32 before Bash's directory (${BASH%/*})."* ]]
+  done
+}
+
+@test "does not warn when Windows System32 follows Bash on PATH" {
+  run --separate-stderr env PATH="$PATH:/c/Windows/System32" "$BASH" "$BATS_ROOT/bin/bats" --version
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == 'Bats '* ]]
+  [ -z "$stderr" ]
+}
+
 @test "invalid filename prints an error" {
   bats_require_minimum_version 1.5.0
   reentrant_run -1 bats nonexistent

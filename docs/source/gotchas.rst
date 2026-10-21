@@ -1,10 +1,24 @@
 Gotchas
 =======
 
+Windows System32 commands shadow Unix commands in Git Bash
+----------------------------------------------------------
+
+Git Bash, MSYS2, and similar Bash environments can run Windows executables from ``C:/Windows/System32``.
+When that directory occurs before Bash's Unix-tool directory in ``PATH``, commands such as ``find`` and ``sort`` can resolve to their Windows versions.
+This can also affect other commands with Windows names.
+
+Bats prints a warning when it detects this ordering.
+Update the environment that starts Bats so that Git Bash's tool directory, usually ``/usr/bin``, comes before ``C:/Windows/System32``:
+
+.. code-block:: bash
+
+    export PATH="/usr/bin:$PATH"
+
 My test fails although I return true?
 -------------------------------------
 
-Using `return 1` to signify `true` for a success as is done often in other languages does not mesh well with Bash's 
+Using `return 1` to signify `true` for a success as is done often in other languages does not mesh well with Bash's
 convention of using return code 0 to signify success and everything non-zero to indicate a failure.
 
 Please adhere to this idiom while using bats, or you will constantly work against your environment.
@@ -89,9 +103,9 @@ Bats uses a custom syntax for annotating tests (`@test`) that is not bash compli
 Therefore, standard bash tooling won't be able to interact directly with `.bats` files.
 Shellcheck supports bats' native syntax as of version 0.7.
 
-Additionally, there is bash compatible syntax for tests: 
+Additionally, there is bash compatible syntax for tests:
 
-.. code-block:: bash 
+.. code-block:: bash
 
     function bash_compliant_function_name_as_test_name { # @test
         # your code

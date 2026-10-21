@@ -68,6 +68,28 @@ if ! BATS_PATH=$(bats_readlinkf "${BASH_SOURCE[0]}" 2>/dev/null); then
 fi
 
 export BATS_SAVED_PATH=$PATH
+
+bats_warn_if_system32_precedes_bash() {
+  local bash_directory path_before_bash system32_pattern nocasematch_was_set=
+
+  bash_directory=${BASH%/*}
+  [[ $bash_directory != "$BASH" && $PATH == *"$bash_directory"* ]] || return 0
+
+  path_before_bash=${PATH%%"$bash_directory"*}
+  system32_pattern='(^|:|[[:alpha:]]:|/[[:alpha:]])[/\\]windows[/\\]system32([/:;\\]|$)'
+
+  if shopt -q nocasematch; then
+    nocasematch_was_set=1
+  fi
+  shopt -s nocasematch
+  if [[ $path_before_bash =~ $system32_pattern ]]; then
+    printf "WARNING: PATH contains Windows System32 before Bash's directory (%s). Windows commands may shadow Unix commands. Place %s before Windows System32 in PATH.\n" "$bash_directory" "$bash_directory" >&2
+  fi
+  [[ -n $nocasematch_was_set ]] || shopt -u nocasematch
+}
+
+bats_warn_if_system32_precedes_bash
+
 BATS_BASE_LIBDIR=lib # this will be patched with the true value in install.sh
 
 # A Windows process can supply BATS_LIB_PATH in Windows form. Normalize it
